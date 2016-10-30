@@ -18,7 +18,7 @@ def cluster_tfidf(tfidf_matrix, projection):
     print("Explained variance of the SVD step: {}%".format(
          int(explained_variance * 100)))
 
-    model = KMeans(8)
+    model = KMeans(12)
     clusters = model.fit_predict(coords)
 
     reduc = TruncatedSVD(n_components=projection)

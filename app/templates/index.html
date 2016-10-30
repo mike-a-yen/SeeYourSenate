@@ -40,14 +40,21 @@
       {{ cluster_plot|safe }}
       <p><small>Try the pan and zoom tools</small></p>
       <p>Bills are clustered together by use of similar vocabulary.
-	Bills that mention similar things are grouped together, for
-	example bills that
+	Bills that mention similar things are grouped together. For
+	example, bills that
 	mention education are in a different group than bills that mention
-	terrorism.
+	terrorism. The body of text used to identify each bill was taken from
+	the each bill's title. This could be improved if the body of each bill
+	was used rather than just the title.
 	<br>
 	Large dots are "Yay" votes and smaller dots are "Nay" votes,
 	and from this visualization you can see Boxer has a tendency to vote
-	"Yay" for all bills in some clusters.</p>
+	"Yay" for all bills in some clusters and "Nay" for bills in other
+	clusters.</p>
+      <p>
+	The fact that Boxer has a pattern of voting for or against bills with
+	certain content, allows for a model to be built to predict her voting behavior.
+	</p>
     </div>
     
     <div class="col-xs-6">
