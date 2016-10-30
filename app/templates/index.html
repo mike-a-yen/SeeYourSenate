@@ -38,15 +38,23 @@
 	<h4>Congressional Bill Clusters</h4>
       </div>
       {{ cluster_plot|safe }}
+      <p>Try the panning tools</p>
       <br>
-      <p>Groups of similar bills are shown with different colors.</p>
+      <p>Bills are clustered together by use of similar vocabulary. Bills that
+      mention similar things are grouped together, for example bills that
+      mention education are in a different group than bills that mention
+	terrorism.
+	<br>
+	Large dots are "Yay" votes and smaller dots are "Nay" votes,
+	and from this visualization you can see Boxer has a tendency to vote
+	"Yay" for all bills in some clusters.</p>
     </div>
     
     <div class="col-xs-6">
       <div class="header">
 	<h4>Correct Prediction Probability</h4>
       </div>
-      <img src="/static/img/model_performance.png"
+      <img src="/static/img/model_performance2.png"
 	   width="480"
 	   height="400">
     </div>
