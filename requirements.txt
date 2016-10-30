@@ -2,7 +2,6 @@ Flask==0.10.1
 flask-login>=0.3.2
 gunicorn==19.3.0
 SQLAlchemy>=0.7
-Werkzeug>=0.7
 Jinja2>=2.4
 itsdangerous>=0.21
 click>=2.0
