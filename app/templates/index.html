@@ -38,11 +38,11 @@
 	<h4>Congressional Bill Clusters</h4>
       </div>
       {{ cluster_plot|safe }}
-      <p>Try the panning tools</p>
-      <br>
-      <p>Bills are clustered together by use of similar vocabulary. Bills that
-      mention similar things are grouped together, for example bills that
-      mention education are in a different group than bills that mention
+      <p><small>Try the pan and zoom tools</small></p>
+      <p>Bills are clustered together by use of similar vocabulary.
+	Bills that mention similar things are grouped together, for
+	example bills that
+	mention education are in a different group than bills that mention
 	terrorism.
 	<br>
 	Large dots are "Yay" votes and smaller dots are "Nay" votes,
@@ -57,6 +57,20 @@
       <img src="/static/img/model_performance2.png"
 	   width="480"
 	   height="400">
+      <p><small>This model will correctly predict the
+      "pass" or "no pass" outcome with 80% accuracy.</small></p>
+      <p>The voting behavior of the senate as a whole can be predicted by the
+	voting behavior of individual senators. This representation can be
+	more accurate than random if the individual predictive models for each
+	senator are more accurate than 50%. This increased accuracy allows better predictions to be made on
+	the outcomes of individual bills. 
+	Building 100 individual
+	models that can predict the voting behavior of each
+	senator with an accuracy of 70% or greater, will correctly determine
+	whether or not the bill passes with an accuracy of at least 80%. 
+      </p>
+      <p> This means when fully built, this model will correctly predict the
+      "pass" or "no pass" outcome of future laws with an accuracy of 80%.
     </div>
   </div>
 </div>
