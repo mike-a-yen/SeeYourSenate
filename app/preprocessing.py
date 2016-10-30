@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import pickle
 from app.utils import document_title
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -26,18 +27,20 @@ def cluster_tfidf(tfidf_matrix, projection):
 
     return xy, clusters
 
-raw = pd.read_csv('data/boxer.csv')
-raw['bill_title'] = raw['bill'].apply(document_title)
-raw['amendment_title'] = raw['amendment'].apply(document_title)
-raw['text'] = raw['question'].str.cat(raw['bill_title'],sep=' ')
-raw['text'] = raw['text'].str.cat(raw['amendment_title'],sep=' ')
-raw['text'] = raw['text'].apply(lambda x: re.sub("\d+", "", x))
+#raw = pd.read_csv('data/boxer.csv')
+#raw['bill_title'] = raw['bill'].apply(document_title)
+#raw['amendment_title'] = raw['amendment'].apply(document_title)
+#raw['text'] = raw['question'].str.cat(raw['bill_title'],sep=' ')
+#raw['text'] = raw['text'].str.cat(raw['amendment_title'],sep=' ')
+#raw['text'] = raw['text'].apply(lambda x: re.sub("\d+", "", x))
 
+raw = pd.read_csv('data/app_data.csv')
 votes = raw['vote'].values
 
-tfidf = TfidfVectorizer(max_df=0.5,min_df=2,
-                        max_features=10000,
-                        stop_words='english',
-                        use_idf=True, tokenizer=None, ngram_range=(1,3))
-tfidf_matrix = tfidf.fit_transform(raw['text'])
+#tfidf = TfidfVectorizer(max_df=0.5,min_df=2,
+#                        max_features=10000,
+#                        stop_words='english',
+#                        use_idf=True, tokenizer=None, ngram_range=(1,3))
+#tfidf_matrix = tfidf.fit_transform(raw['text'])
+tfidf_matrix = pickle.load(open('data/tfidf_matrix.pklb','rb'))
 xy, clusters = cluster_tfidf(tfidf_matrix, 3)
