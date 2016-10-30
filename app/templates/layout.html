@@ -1,0 +1,79 @@
+<!doctype html>
+<title>Will It Pass -- Will Congress Pass the Bill</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta charset="utf-8">
+<style>
+  body {
+  padding-top: 60px;
+  padding-bottom: 100px;
+  }
+</style>
+
+<!--
+
+-->
+<link href="/static/bootstrap.css" rel="stylesheet">
+<link href="/static/bootstrap-responsive.css" rel="stylesheet">
+<script src="/static/jquery.js"></script>
+<script src="/static/bootstrap.js"></script>
+
+
+<link href="/static/css/bootstrap.css" rel="stylesheet">
+
+<link href="/static/css/bootstrap-theme.css" rel="stylesheet">
+
+<script src="/static/js/jquery-3.1.1.min.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+
+
+<!-- Bootstrap-select -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.11.2/css/bootstrap-select.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.11.2/js/bootstrap-select.min.js"></script>
+
+
+
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <button type="button" class="btn btn-navbar"
+	      data-toggle="collapse"
+	      data-target=".nav-collapse">
+	<span class="icon-bar"></span>
+	<span class="icon-bar"></span> <span
+					  class="icon-bar"></span>
+      </button>
+      <a class="brand" href="/">will it pass</a>
+      <div class="nav-collapse collapse">
+	<ul class="nav">
+	  <li class="active"><a href="/">Home</a></li>
+	</ul>
+      </div>
+      <!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+{%- for category, message in get_flashed_messages(with_categories=true) %}
+<div class="container">
+<p class="flask {{ category }}-flash" style="color:red;">{{
+  "Error: " if category == 'error' }}{{ message }}</p>
+{%- endfor %}
+</div>
+
+<div id="main" class="container">
+  {% block body %}{% endblock %}
+  <hr>
+  <footer id="footer">
+    built by Michael Yen
+    <a target="_blank" href="https://www.linkedin.com/pub/michael-yen/10a/553/674">
+      <img src="https://static.licdn.com/scds/common/u/img/webpromo/btn_viewmy_160x33.png"
+           width="160" height="33"
+	   border="0"
+	   alt="View Michael Yen'sprofile on LinkedIn">
+    </a>
+    <br>
+    Data Incubator SemiFinalist
+  </footer>
+  </div>

@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <h2>Pizza Yelp Reviews </h2>
+    <h3>{{ current_state }}</h3>
+    <h3>{{ current_city }}</h3>
+    <div class="col-xs-4">
+      <p>Search by:</p>
+      <form action="" method=post class="form">
+	<div class="form-group">
+	  <div class="control-group">
+	    <div class="controls">
+	      {% if current_state %}
+	      state here
+	      <select class="selectpicker"
+		      name="state"
+		      title={{ current_state }}
+		      data-live-search="true"
+		      onchange="this.form.submit()">
+		{% else %}
+		state not here
+		<select class="selectpicker"
+			name="state"
+			title="Select State"
+			data-live-search="true"
+			onchange="this.form.submit()">
+		  {% endif %}	  
+		  {%- for state in states %}
+		  {% if state == current_state %}
+		  <option value="{{ state }}"
+			  selected="selected">{{ state }}</option>
+		  {% else %}
+		  <option value="{{ state }}">{{ state }}</option>
+		  {% endif %}
+		  {%- endfor %}
+		</select>
+	    </div>
+	  </div>
+	  
+	  <div class="control-group">
+	    <div class="controls">
+	      <p>cc {{ current_city }}</p>
+	      {% if current_city %}
+	      <select class="selectpicker show-tick"
+		      name="city"
+		      title={{ current_city }}
+		      data-live-search="true"
+		      onchange="this.form.submit()">
+		{% else %}
+		<select class="selectpicker show-tick"
+			name="city"
+			title="Select City"
+			data-live-search="true"
+			onchange="this.form.submit()">
+		  {% endif %}
+		  {%- for city in cities %}
+		  {% if city == current_city %}
+		  <option value="{{ city }}"
+			  selected="selected">{{ city }}</option>
+		  {% else %}
+		  <option value="{{ city }}">{{ city }}</option>
+		  {% endif %}
+		  {%- endfor %}
+		</select>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="control-group">
+	  <div class="controls">
+	    <button type="submit btn" class="btn btn-primary">Search</button>
+	  </div>
+	</div>
+      </form>
+      <div class="control-group">
+	<div class="controls">
+	  <button action="/trends"
+		  class="btn btn-danger"
+		  type="submit"
+		  onclick="window.location.href='trends'">Reset</button>
+	</div>
+      </div>
+      
+    </div>
+    
+    <div class="col-xs-8">
+      {% if table %}
+      <h4>Search Results</h4>
+      <table class="table table-hover">
+
+	{%- for field in fields %}
+	<th> {{ field }}
+	{%- endfor %}
+
+	  {%- for row in table %}
+	  <tr class={{ "success" if row.done }}>
+	    {%- for field in fields %}
+	    <td>{{row[field]}}</td>
+	    {%- endfor %}
+	  {%- endfor %}
+      </table>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

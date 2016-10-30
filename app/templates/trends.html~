@@ -1,0 +1,4 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2>Search Yelp Review Trends </h2>
+{% endblock %}

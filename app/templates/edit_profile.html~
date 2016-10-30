@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block body %}
+<form action="" method=post class="form-horizontal">
+  {% if current_user.is_authenticated %}
+  <h2>Hello, {{ current_user.name }} </h2>
+  {% endif %}
+  <h4>Edit Profile</h4>
+
+  
+  <div class="control-group">
+    <div class="controls">
+      <h5>Name</h5>
+      <input type="name" id="name" name="name"
+             class="input-xlarge"
+	     placeholder="optional">
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="controls">
+      <h5>Email</h5>
+      <input type="text" id="email" name="email"
+             class="input-xlarge"
+	     default={{current_user.email}}
+	     placeholder={{ current_user.email }}>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="controls">
+      <h5>Password</h5>
+      <input type="password" id="password" name="password"
+             class="input-xlarge"
+	     default={{current_user.password}}
+	     placeholder="Change Password">
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="controls">
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

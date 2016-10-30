@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+<div id="main" class="container">
+  {% if current_user.is_authenticated %}
+  <h2>Hello, {{ current_user.name }}</h2>
+  {% endif %}
+  <table class="table table-hover">
+    <tr>
+      <th>User ID
+      <th>Email
+      <th>Registered On
+	<tr class={{ "success" if current_user.done }}>
+	  <td>{{ current_user.id }}
+	  <td>{{ current_user.email }}</td>
+	  <td>{{ current_user.registered_on }}</td>
+  </table>
+  <p>
+    <a href="{{ url_for('edit_profile') }}" class="btn btn-medium btn-primary">Edit Profile</a>
+
+
+</div>
+{% endblock %}

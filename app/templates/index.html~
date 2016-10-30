@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+  <h2>Welcome to Will It Pass</h2>
+  <div class="col-xs-6">
+    Data provided by the
+    <a href="https://www.govtrack.us/developers/data">govtrack</a>.
+    <br>
+    Congressional voting data is downloadable
+    <a href="https://www.govtrack.us/data/congress/">here</a>.
+  </div>
+  
+  <div class="col-xs-6">
+    <img src="/static/img/bill-kmeans.png">
+    {{ cluster_plot }}
+  </div>
+
+  <div class="col-xs-6">
+  <img src="/static/img/model_performance.png">
+  </div>
+</div>
+{% endblock %}
