@@ -2,7 +2,8 @@ import numpy as np
 
 import matplotlib
 matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt, mpld3
+import matplotlib.pyplot as plt
+import mpld3
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 
