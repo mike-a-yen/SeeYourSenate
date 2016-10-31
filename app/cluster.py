@@ -1,7 +1,7 @@
 import numpy as np
 
-#import matplotlib
-#matplotlib.use('TkAgg')
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import mpld3
 from mpl_toolkits.mplot3d import Axes3D
@@ -39,6 +39,9 @@ def plot_2d(xy, clusters, votes):
     ax.set_xticklabels([])
     ax.tick_params(axis=u'both', which=u'both',length=0)
     plt.axis('off')
-    return mpld3.fig_to_html(fig)
-
+    html = mpld3.fig_to_html(fig)
+    fig_file = open('app/static/img/cluster.html','w')
+    fig_file.write(html)
+    fig_file.close()
+    return 'app/static/img/cluster.html'
     

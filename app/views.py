@@ -7,6 +7,7 @@ from app.cluster import plot_2d, plot_3d
 @app.route('/')
 @app.route('/index')
 def index():
-    cluster_plot = plot_2d(xy, clusters, votes)
+    plot_2d(xy,clusters,votes)
+    cluster_plot = open('app/static/img/cluster.html','r').read()
     return flask.render_template('index.html',
                                  cluster_plot=cluster_plot)
