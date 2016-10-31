@@ -43,4 +43,12 @@ votes = raw['vote'].values
 #                        use_idf=True, tokenizer=None, ngram_range=(1,3))
 #tfidf_matrix = tfidf.fit_transform(raw['text'])
 tfidf_matrix = pickle.load(open('data/tfidf_matrix.pklb','rb'))
-xy, clusters = cluster_tfidf(tfidf_matrix, 3)
+
+#xy, clusters = cluster_tfidf(tfidf_matrix, 3)
+#pickle.dump(xy,
+#            open('data/xy.pklb','wb'))
+#pickle.dump(clusters,
+#            open('data/clusters.pklb','wb'))
+
+xy = pickle.load(open('data/xy.pklb','rb'))
+clusters = pickle.load(open('data/clusters.pklb','rb'))
