@@ -71,9 +71,11 @@
       <div class="header">
 	<h4>Correct Prediction Probability</h4>
       </div>
-      <img src="/static/img/model_performance.png"
+      {{ stats_plot|safe }}
+      <!--      <img src="/static/img/model_performance.png"
 	   width="480"
 	   height="400">
+-->
       <p><small>This model will correctly predict the
       "pass" or "no pass" outcome with 80% accuracy.</small></p>
       <p>The voting behavior of the senate as a whole can be predicted by the

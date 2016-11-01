@@ -6,5 +6,7 @@ import flask
 @app.route('/index')
 def index():
     cluster_plot = open('app/static/img/cluster.html','r').read()
+    stats_plot = open('app/static/img/model_performance.html','r').read()
     return flask.render_template('index.html',
-                                 cluster_plot=cluster_plot)
+                                 cluster_plot=cluster_plot,
+                                 stats_plot=stats_plot)
