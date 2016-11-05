@@ -94,6 +94,7 @@ def build_model(memid):
 
 
 def build_save_model(member):
+    print(member.first_name, member.last_name)
     memid = member.id
     member.nn_model_path = 'data/nn_models/'+memid+'.pklb'
     member.vectorizer_path = 'data/vectorizers/'+memid+'.pklb'
