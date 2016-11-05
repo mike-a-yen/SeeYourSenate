@@ -76,15 +76,19 @@ class Member(db.Model):
     display_name = db.Column('display',db.String(80))
     state = db.Column('state',db.String(40))
     party = db.Column('party',db.String(20))
+    nn_model_path = db.Column('nn_model_path',db.String(40))
+    vectorizer_path = db.Column('vectorizer_path',db.String(40))
 
-
-    def __init__(self, id, first, last, display, state, party):
+    def __init__(self, id, first, last, display, state, party,
+                 nn_model_path=None, vectorizer_path=None):
         self.id = id
         self.first_name = first
         self.last_name = last
         self.display_name = display
         self.state = state
         self.party = party
+        self.nn_model_path = nn_model_path
+        self.vectorizer_path = vectorizer_path
 
 print('Creating DB')
 db.create_all()
