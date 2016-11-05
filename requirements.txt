@@ -16,3 +16,5 @@ mpld3>=0.2
 numpy>=1.11.2
 pandas>=0.18.1
 scikit-learn>=0.17.1
+rq>=0.6.0
+redis>=2.10.5
