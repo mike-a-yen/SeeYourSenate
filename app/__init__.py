@@ -16,3 +16,10 @@ db = SQLAlchemy(app)
 
 from app import views
 from app.models import *
+from app.build_models import build_models
+
+print('#'*50)
+print('Building member models')
+build_models()
+print('Done building models')
+print('#'*50)

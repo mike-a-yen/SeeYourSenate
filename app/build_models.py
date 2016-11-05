@@ -71,6 +71,19 @@ def get_decision_text(memid):
     return list(zip(bill, question, subject))
 
 
+def get_vote_history(memid):
+        votes = db.session.query(MemberSession.vote)\
+                .filter_by(member_id=memid).all()
+        return list(map(lambda x: x[0],votes))
+
+def vote_map(vote, default=0):
+    if vote == 'Yea':
+        return 1
+    elif vote == 'Nay':
+        return 0
+    else:
+        return default
+            
 def build_model(memid):
     """Build a knn model for each member
     member is a database Member object
@@ -109,7 +122,6 @@ def build_models():
     """Build knn models for all members in DB
     this can be run whenever the db gets an update
     """
-    p = Pool(cpu_count())
     members = db.session.query(Member).all()
-    results = p.map(build_save_model, members)
+    results = [build_save_model(member) for member in members]
     return np.mean(results) == 1
