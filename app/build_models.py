@@ -115,7 +115,7 @@ def build_save_model(member):
     clf, tfidf = build_model(memid)
     
     pickle.dump(clf,open(member.nn_model_path,'wb'))
-    pickle.dump(vectorizer,open(member.vectorizer_path,'wb'))  
+    pickle.dump(tfidf,open(member.vectorizer_path,'wb'))  
     return True
     
 def build_models():
