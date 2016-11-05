@@ -5,9 +5,8 @@ import os
 
 app = Flask(__name__)
 
-local_db = 'sqlite:////Users/mayen/Programming/WillItPass/tmp/congress.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL',
-                                                       local_db)
+local_db = 'sqlite:////'+os.path.join(os.getcwd(),'tmp/congress.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = local_db
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 print('DB_URI :',app.config['SQLALCHEMY_DATABASE_URI'])
