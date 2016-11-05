@@ -26,6 +26,7 @@ from app.build_models import build_models
 print('#'*50)
 print('Building member models')
 job = q.enqueue_call(func=build_models,
+                     timeout=600,
                      result_ttl=5000)
 print('RQ ID :',job.get_id())
 print('Build job set in queue')
