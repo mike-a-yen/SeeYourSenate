@@ -1,3 +1,5 @@
+from app import db
+from app.models import *
 import numpy as np
 import json
 import re
@@ -20,3 +22,17 @@ def document_title(doc):
         return ''
     else:
         return json.loads(doc).get('title','')  
+
+
+def get_random_member():
+    n_members = db.session.query(Member).count()
+    ind = np.random.randint(0,n_members)
+    member = db.session.query(Member).offset(ind).first()
+    return member
+
+def merge_dicts(list_of_dicts):
+    new = {}
+    for d in list_of_dicts:
+        new.update(d)
+    return new
+    

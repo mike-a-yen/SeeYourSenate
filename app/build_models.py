@@ -17,12 +17,16 @@ import nltk
 from nltk.stem.snowball import SnowballStemmer
 from textblob import TextBlob
 stemmer = SnowballStemmer('english')
-stopwords = nltk.corpus.stopwords
+stopwords = nltk.corpus.stopwords.words('english')
+stopwords += ['amdt', 'amend', 'amendment',
+              'bill', 'motion','title','act','samdt',
+              'table','year']
 
-def tokenize_and_stem(text):
+def tokenize_and_stem(text, stopwords=stopwords):
     tokens = [word for word in TextBlob(text).words]
     filtered_tokens = [re.sub('[^a-zA-Z]','',w) for w in tokens]
     stems = [stemmer.stem(t) for t in filtered_tokens]
+#    filtered_stems = [stem for stem in stems if stem not in stopwords]
     return stems
 
 def error_rate(predictions, actuals):
@@ -94,10 +98,11 @@ def build_model(memid):
     df['body'] = df['body'].apply(lambda x: re.sub("\d+", "", x))
     df['result'] = df['vote'].apply(vote_map)
     
-    tfidf = TfidfVectorizer(max_df=0.9,
-                            max_features=10000,
-                            stop_words='english',
-                            use_idf=True, tokenizer=None, ngram_range=(1,3))
+    tfidf = TfidfVectorizer(max_features=10000,
+                            stop_words=stopwords,
+                            use_idf=True,
+                            tokenizer=None,
+                            ngram_range=(1,3))
 
     tfidf_matrix = tfidf.fit_transform(df['body'])
     clf =  KNeighborsClassifier(n_neighbors=50,

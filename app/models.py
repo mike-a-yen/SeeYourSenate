@@ -90,5 +90,6 @@ class Member(db.Model):
         self.nn_model_path = nn_model_path
         self.vectorizer_path = vectorizer_path
 
-print('Creating DB')
-db.create_all()
+if __name__ == '__main__':
+    print('Creating DB')
+    db.create_all()
