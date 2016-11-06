@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+  <h2>Senator Summary</h2>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <h4>About</h4>
+      <p>Congress votes on about one new bill everyday.
+	Keeping track of what your representative votes
+	for and against is a daunting task, and it is
+	even harder to determine if your senator is voting
+	in the way you would vote.</p>
+      <p>Will It Pass keeps track of the voting history of
+	each senator and highlights the important words in
+	the bills voted for and against. This way you can
+	get a quick summary of the voting behavior of your
+	representative.</p>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="row">
+    <h4>{{ first_name }} {{ last_name }} ({{ state }}-{{ party }}) Vote History</h4>
+	<div class="col-xs-6"> 
+	  {{ yay_cloud|safe }}
+	  <p>Key words extracted from the "Yay"
+	      votes of senator {{ last_name }}.
+	      These words were frequently mentioned
+	      in bills {{ last_name }} voted in favor of.</p>
+	</div>    
+	<div class="col-xs-6">
+	  {{ nay_cloud|safe }}
+	  <p>Key words extracted from the "Nay"
+	      votes of senator {{ last_name }}.
+	      These words were frequently mentioned
+	      in bills {{ last_name }} voted against.</p>
+	</div>
+  </div>
+</div>
+{% endblock %}
