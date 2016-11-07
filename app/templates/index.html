@@ -1,45 +1,50 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="container-fluid">
-  <h2>Welcome to Will It Pass</h2>
-  <div class="col-xs-6">
-    Data provided by
-    <a href="https://www.govtrack.us/developers/data">govtrack</a>.
-    <br>
-    Congressional voting data is downloadable
-    <a href="https://www.govtrack.us/data/congress/">here</a>.
-    <br>
-    <br>
+<div class="jumbotron">
+  <div class="container-fluid">
+    <div class="row">
+      <h2>Welcome to Will It Pass</h2>
+      <div class="col-xs-12">
+	Data provided by
+	<a href="https://www.govtrack.us/developers/data">govtrack</a>.
+	<br>
+	Congressional voting data is downloadable
+	<a href="https://www.govtrack.us/data/congress/">here</a>.
+	<br>
+	<br>
+      </div>
+    </div>
   </div>
 </div>
-
-<div class="container">
+<div class="container-fluid">
   <div class="row">
     <div class="col-xs-12">
       <h4>About</h4>
       <p>Will It Pass has built a model that predicts the probability of a bill
-      passing through congress. We model the voting behavior of each
-      congressman from the text contained inside the bill, and with this
-      information determine the probability of the bill being passed into
-      law. Preliminary evidence has shown that Will It Pass can predict the
-      outcome of each bill with 80% accuracy. That is 8 out of 10 times Will It
+	passing through congress. We model the voting behavior of each
+	congressman from the text contained inside the bill, and with this
+	information determine the probability of the bill being passed into
+	law. Preliminary evidence has shown that Will It Pass can predict the
+	outcome of each bill with 80% accuracy. That is 8 out of 10 times Will It
 	Pass correctly determines if the bill passes or fails.</p>
       <p>This information can be used to see if your representative is likely to
-      vote for bills you care about. </p>
+	vote for bills you care about. </p>
+      
       <h4>Preliminary Analysis</h4>
       <p>The following analysis was done by studying the voting habits of
-      Senator Barbara Boxer (CA-D) over the last 16 years. In total, she
-      participated in over 5,000 votes, with an approximately 50-50 split between
-      "Yay" and "Nay" votes. By vectorizing the text in the headers of each
-      bill, I was able to build a model that predicted Boxer's voting behavior
+	  Senator Barbara Boxer (CA-D) over the last 16 years. In total, she
+	participated in over 5,000 votes, with an approximately 50-50 split between
+	"Yay" and "Nay" votes. By vectorizing the text in the headers of each
+	bill, I was able to build a model that predicted Boxer's voting behavior
 	with 70% accuracy, which is an improvement over random guessing.
 	If I build a similar model for all other senators, retaining the 70%
-      accuracy, I will be able to correctly predict wether or not a bill will
-      pass the senate with an accuracy of 80%. 
-      </p>  
+	accuracy, I will be able to correctly predict wether or not a bill will
+	pass the senate with an accuracy of 80%. 
+      </p>
     </div>
   </div>
 </div>
+
 
 <div class="container">
   <div class="row">
@@ -47,7 +52,9 @@
       <div class="header">
 	<h4>Congressional Bill Clusters</h4>
       </div>
-      {{ cluster_plot|safe }}
+      <div class="center-block">
+	{{ cluster_plot|safe }}
+      </div>
       <p><small>Try the pan and zoom tools</small></p>
       <p>Bills are clustered together by use of similar vocabulary.
 	Bills that mention similar things are grouped together. For
