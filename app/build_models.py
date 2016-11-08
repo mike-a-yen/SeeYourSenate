@@ -14,6 +14,7 @@ from sklearn.cross_validation import KFold, train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import nltk
+nltk.data.path.append('/app/nltk_data/')
 from nltk.stem.snowball import SnowballStemmer
 from textblob import TextBlob
 stemmer = SnowballStemmer('english')
