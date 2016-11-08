@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
-import nltk
-nltk.download()
+
+
 
 from rq import Queue
 from rq.job import Job
