@@ -3,18 +3,15 @@ from app.models import *
 from app.preprocessing import xy, clusters, votes
 from app.member_topics import vote_topic_freq
 from app.utils import get_random_member,get_senate
-
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-import mpld3
-from app.cloud import make_word_cloud, save_member_cloud
+#from app.cloud import make_word_cloud, save_member_cloud
 
 import flask
 
 import numpy as np
 import pickle
 
+import matplotlib.pyplot as plt
+import mpld3
 
 
 @app.route('/')
