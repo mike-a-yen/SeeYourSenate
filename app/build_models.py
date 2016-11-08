@@ -1,5 +1,3 @@
-from multiprocessing import Pool, cpu_count
-
 from app import db
 from app.models import *
 
@@ -10,7 +8,6 @@ import json
 import pickle
 
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.cross_validation import KFold, train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import nltk
@@ -21,7 +18,7 @@ stemmer = SnowballStemmer('english')
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords += ['amdt', 'amend', 'amendment',
               'bill', 'motion','title','act','samdt',
-              'table','year']
+              'table','year','cba','pn','con']
 
 def tokenize_and_stem(text, stopwords=stopwords):
     tokens = [word for word in TextBlob(text).words]
