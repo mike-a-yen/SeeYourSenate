@@ -30,6 +30,14 @@ def get_random_member():
     member = db.session.query(Member).offset(ind).first()
     return member
 
+def get_senate(congress=114):
+    members = db.session.query(Member).distinct(Member.id)\
+                        .filter(Session.chamber=='s')\
+                        .filter(Session.congress_id==congress)\
+                        .filter(Session.id==MemberSession.session_id)\
+                        .filter(Member.id==MemberSession.member_id).all()
+    return members
+    
 def merge_dicts(list_of_dicts):
     new = {}
     for d in list_of_dicts:

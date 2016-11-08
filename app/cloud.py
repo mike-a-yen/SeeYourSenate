@@ -14,17 +14,26 @@ from wordcloud import WordCloud, STOPWORDS
 
 def green_color_func(word, font_size, position, orientation,
                    random_state=None, **kwargs):
-    return tuple(Greens_9.colors[np.random.randint(3,9)])
+    return tuple(Greens_9.colors[np.random.randint(5,9)])
 
 def red_color_func(word, font_size, position, orientation,
                    random_state=None, **kwargs):
-    return tuple(Reds_9.colors[np.random.randint(3,9)])
+    return tuple(Reds_9.colors[np.random.randint(5,9)])
 
 def cloud_to_fig(cloud):
-    fig,ax = plt.subplots(figsize=(5,5))
-    ax.imshow(cloud,origin='lower')
+    fig,ax = plt.subplots()
+    fig.tight_layout()
+    ax.imshow(cloud)
+    ax.axis('off')
     return fig
-    
+
+def save_member_cloud(fig,member,key):
+    path = '/static/word_clouds/'+\
+           key+'_'+member.first_name+'_'+\
+           member.last_name+'.png'
+    fig.savefig('app/'+path, bbox_inches='tight')
+    return path
+
 def make_word_cloud(word_freq, type='Yea'):
     """Make a word cloud from a list of words"""
     if type =='Yea':
@@ -41,9 +50,8 @@ def make_word_cloud(word_freq, type='Yea'):
     mask.paste(thumb,thumb)
     mask = np.array(mask)
     
-    
     wc = WordCloud(background_color='white',
-                   max_words=80,
+                   max_words=100,
                    mask=mask,
                    stopwords=STOPWORDS)
     #wc = wc.generate_from_frequencies(word_freq)

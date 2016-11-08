@@ -21,23 +21,61 @@
     </div>
   </div>
 </div>
+
+
 <div class="container-fluid">
   <div class="row">
-    <h4>{{ first_name }} {{ last_name }} ({{ state }}-{{ party }}) Vote History</h4>
-	<div class="col-xs-6"> 
-	  {{ yay_cloud|safe }}
-	  <p>Key words extracted from the "Yay"
-	      votes of senator {{ last_name }}.
-	      These words were frequently mentioned
-	      in bills {{ last_name }} voted in favor of.</p>
-	</div>    
-	<div class="col-xs-6">
-	  {{ nay_cloud|safe }}
-	  <p>Key words extracted from the "Nay"
-	      votes of senator {{ last_name }}.
-	      These words were frequently mentioned
-	      in bills {{ last_name }} voted against.</p>
+    <div class="col-xs-12">
+      <div class="header">
+        <h3>Vote History</h3>
+      </div>
+      <form class="form-inline" action="/senator" method="POST">
+	<div class="form-group">
+	  <label for="sel1">Select a senator:</label>
+	  <select class="form-control input-small" id="sel1" name="senator">
+	    <option value="" selected disabled>Please select</option>
+	    {%- for senator in senators %}
+	    <option value="{{ senator }}">{{ senator }}</option>
+	    {% endfor %}
+	  </select>
 	</div>
+	<button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<br>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="header">
+	<h4>{{ first_name }} {{ last_name }} ({{ state }}-{{ party }})</h4>
+      </div>
+      <div class="col-xs-6">
+	<div class="header text-center">
+	  <h4>"Yay"</h4>
+	</div>
+	<img src="{{ yay_cloud }}"
+	     class="img-responsive" alt="Vote 'Yay' Words">
+	<p>Key words extracted from the "Yay"
+	  votes of senator {{ last_name }}.
+	  These words were frequently mentioned
+	  in bills {{ last_name }} voted in favor of.</p>
+      </div>    
+      <div class="col-xs-6">
+	<div class="header text-center">
+	  <h4>"Nay"</h4>
+	</div>
+	<img src="{{ nay_cloud }}"
+	     class="img-responsive" alt="Vote 'Nay' Words">
+	<p>Key words extracted from the "Nay"
+	  votes of senator {{ last_name }}.
+	  These words were frequently mentioned
+	  in bills {{ last_name }} voted against.</p>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
