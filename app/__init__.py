@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
+import nltk
+nltk.download()
 
 from rq import Queue
 from rq.job import Job
@@ -26,7 +28,7 @@ from app.build_models import build_models
 print('#'*50)
 print('Building member models')
 job = q.enqueue(build_models,
-                timeout=600,
+                timeout=1200,
                 result_ttl=5000)
 print('RQ ID :',job.get_id())
 print('Build job set in queue')
