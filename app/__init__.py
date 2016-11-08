@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 
 
-
 from rq import Queue
 from rq.job import Job
 from worker import conn
