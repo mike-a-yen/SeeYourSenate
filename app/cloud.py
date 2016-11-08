@@ -2,8 +2,6 @@ import os
 import numpy as np
 from PIL import Image
 from scipy.misc import imread
-import matplotlib
-matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 from palettable.colorbrewer.sequential import Reds_9
