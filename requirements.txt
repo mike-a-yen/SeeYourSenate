@@ -19,5 +19,5 @@ scikit-learn>=0.17.1
 rq>=0.6.0
 redis>=2.10.5
 palettable>=2.1.1
-PIL>=3.4.2
+pillow>=3.4.2
 wordcloud>=1.2.1
