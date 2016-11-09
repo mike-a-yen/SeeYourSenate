@@ -1,5 +1,4 @@
-Flask==0.10.1
-flask-login>=0.3.2
+Flask>=0.11.1
 gunicorn==19.3.0
 SQLAlchemy>=0.7
 Jinja2>=2.4
