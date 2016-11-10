@@ -1,17 +1,18 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from config import BASE_DIR
 import os
 
-application = Flask(__name__)
+app = Flask(__name__)
 
-local_db = 'sqlite:////'+os.path.join(os.getcwd(),'tmp/congress.db')
-application.config['SQLALCHEMY_DATABASE_URI'] = local_db
-application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+local_db = BASE_DIR+'/tmp/congress.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'+local_db
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-print('DB_URI :',application.config['SQLALCHEMY_DATABASE_URI'])
-application.config['SECRET_KEY'] = 'secretsarenofun'
-db = SQLAlchemy(application)
-
-
+print('DB_URI :',app.config['SQLALCHEMY_DATABASE_URI'])
+app.config['SECRET_KEY'] = 'secretsarenofun'
+db = SQLAlchemy(app)
 
 from app import views
+
+

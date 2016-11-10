@@ -1,10 +1,10 @@
-from app import application, db
+from app import app, db, BASE_DIR
 from app.models import *
-from app.preprocessing import xy, clusters, votes
 from app.member_topics import vote_topic_freq
 from app.utils import get_random_member,get_senate
 from app.cloud import make_word_cloud, save_member_cloud
 
+import os
 import flask
 
 import numpy as np
@@ -17,8 +17,8 @@ import mpld3
 @application.route('/')
 @application.route('/index')
 def index():
-    cluster_plot = open('app/static/img/cluster.html','r').read()
-    stats_plot = open('app/static/img/model_performance.html','r').read()
+    cluster_plot = open(BASE_DIR+'/app/static/img/cluster.html','r').read()
+    stats_plot = open(BASE_DIR+'/app/static/img/model_performance.html','r').read()
     return flask.render_template('index.html',
                                  cluster_plot=cluster_plot,
                                  stats_plot=stats_plot)
@@ -29,8 +29,8 @@ def senator():
     display_names = list(map(lambda x: x.display_name, senate_members))
     
     member = get_random_member()
-    model = pickle.load(open(member.nn_model_path,'rb'))
-    vectorizer = pickle.load(open(member.vectorizer_path,'rb'))
+    model = pickle.load(open(os.path.join(BASE_DIR,member.nn_model_path),'rb'))
+    vectorizer = pickle.load(open(os.path.join(BASE_DIR,member.vectorizer_path),'rb'))
     
     if flask.request.method == 'POST':
         print(flask.request.form['senator'])

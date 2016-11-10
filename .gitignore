@@ -1,6 +1,7 @@
 data/votes/
 analyze/
 app/static/word_clouds/*
+app/__pycache__/*
 *~
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

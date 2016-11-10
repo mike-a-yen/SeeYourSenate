@@ -1,3 +1,5 @@
+from app import BASE_DIR
+
 from app import db
 from app.models import *
 
@@ -11,20 +13,21 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import nltk
-nltk.data.path.append('/app/nltk_data/')
+nltk.data.path.append(BASE_DIR+'/nltk_data/')
 from nltk.stem.snowball import SnowballStemmer
 from textblob import TextBlob
 stemmer = SnowballStemmer('english')
+
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords += ['amdt', 'amend', 'amendment',
               'bill', 'motion','title','act','samdt',
               'table','year','cba','pn','con']
 
+
 def tokenize_and_stem(text, stopwords=stopwords):
     tokens = [word for word in TextBlob(text).words]
     filtered_tokens = [re.sub('[^a-zA-Z]','',w) for w in tokens]
     stems = [stemmer.stem(t) for t in filtered_tokens]
-#    filtered_stems = [stem for stem in stems if stem not in stopwords]
     return stems
 
 def error_rate(predictions, actuals):
