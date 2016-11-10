@@ -1,5 +1,6 @@
 data/votes/
 analyze/
+app/static/word_clouds/*
 *~
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
