@@ -1,11 +1,11 @@
-from app import db
+from app import db, BASE_DIR
 from app.models import *
-
 from app.build_models import (get_decision_text,
                               get_vote_history,
                               vote_map)
 from app.utils import merge_dicts
 
+import os
 import pandas as pd
 import numpy as np
 import re
@@ -20,7 +20,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 def load_vectorizer(memid):
     member = db.session.query(Member).filter_by(id=memid).first()
-    path = member.vectorizer_path
+    path = os.path.join(BASE_DIR,member.vectorizer_path)
     return pickle.load(open(path,'rb'))
 
 def extract_words_from_clusters(features, centroids, n_words=6):
