@@ -1,7 +1,11 @@
 data/votes/
 analyze/
 app/static/word_clouds/*
-app/__pycache__/*
+.DS_Store
+__pycache__/
+app/__pycache__/
+*.ipynb
+pass-env/
 *~
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
