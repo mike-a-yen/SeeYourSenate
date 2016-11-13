@@ -2,6 +2,7 @@ data/votes/
 data/bills/
 data/active_bills/
 analyze/
+app/templates/*.html~
 app/static/word_clouds/*
 .DS_Store
 __pycache__/
