@@ -27,7 +27,13 @@
 		<td>{{ row.bill_id }}
 		<td>{{ row.top_subject }}</td>
 		<td>{{ row.votes_for }}/{{ row.votes_against }}</td>
-		<td>{{ row.passed }}</td>
+		{% if row.passed %}
+		<td><img src="/static/img/checkmark.png"
+			 width="16px"></td>
+		{% else %}
+		<td><img src="/static/img/xmark.png"
+			 width="16px"></td>
+		{% endif %}
 		{%- endfor %}
 	</table>
       </div>

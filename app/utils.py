@@ -43,6 +43,11 @@ def get_member(memid):
              .filter_by(member_id=memid).first()
     return member
 
+def get_bill(bill_id):
+    bill = db.session.query(Bill)\
+                     .filter_by(bill_id=bill_id).first()
+    return bill
+
 def get_active_bills():
     bills = db.session.query(Bill)\
                       .filter_by(active=1).all()

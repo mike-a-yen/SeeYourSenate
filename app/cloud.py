@@ -1,7 +1,9 @@
 from app import BASE_DIR
+from app.member_topics import vote_topic_freq
 
 import os
 import numpy as np
+import glob
 from PIL import Image
 from scipy.misc import imread
 
@@ -42,7 +44,24 @@ def save_member_cloud(fig,member,key):
     fig.savefig(BASE_DIR+'/app'+path, bbox_inches='tight')
     return path
 
-def make_word_cloud(words, type='Yea'):
+def make_word_cloud(member):
+    base_path = os.path.join(BASE_DIR,'app','static','word_clouds')
+    cloud_path = os.path.join(base_path,'*%s*%s.png'%(member.first_name,
+                                                      member.last_name))
+    if glob.glob(cloud_path):
+        paths = {'Yea':'/static/word_clouds/Yea_%s_%s.png'%(member.first_name,
+                                                            member.last_name),
+                 'Nay':'/static/word_clouds/Nay_%s_%s.png'%(member.first_name,
+                                                            member.last_name)}
+    else: # make clouds
+        vote_words = vote_topic_freq(member.member_id)
+        clouds = {key:generate_word_cloud(words.lower(),key)\
+                  for key,words in vote_words.items()}
+        paths = {key:save_member_cloud(fig,member,key)\
+                 for key,fig in clouds.items()}
+    return paths
+
+def generate_word_cloud(words, type='Yea'):
     """Make a word cloud from a list of words"""
     if type =='Yea':
         thumb = Image.open(BASE_DIR+'/app/static/img/thumbs-up.png')
