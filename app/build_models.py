@@ -51,7 +51,7 @@ def build_model(memid):
                             ngram_range=(1,3))
 
     tfidf_matrix = tfidf.fit_transform(df['body'])
-    clf =  KNeighborsClassifier(n_neighbors=50,
+    clf =  KNeighborsClassifier(n_neighbors=10,
                                 weights='distance')
     clf.fit(tfidf_matrix,df['result'].values)
     return clf, tfidf
