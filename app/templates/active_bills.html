@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>Active Bills</h2>
+      <p>There are {{ active_bills|length }} bills on the senate floor.</p>
+    </div>
+  </div>
+</div>
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="header">
+	<h4>Bills</h4>
+      </div>
+      <div class="col-xs-12">
+	<table class="table table-hover">
+	  <tr>
+	    <th>Bill ID
+	    <th>Main Subject
+	    <th>Predicted Votes (Yay/Nay)
+	    <th>Passed
+	      {%- for row in active_bills %}
+	      <tr class={{ "success" if row.done }}>
+		<td>{{ row.bill_id }}
+		<td>{{ row.top_subject }}</td>
+		<td>{{ row.votes_for }}/{{ row.votes_against }}</td>
+		<td>{{ row.passed }}</td>
+		{%- endfor %}
+	</table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
