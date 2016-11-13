@@ -1,4 +1,6 @@
 data/votes/
+data/bills/
+data/active_bills/
 analyze/
 app/static/word_clouds/*
 .DS_Store
@@ -7,7 +9,3 @@ app/__pycache__/
 *.ipynb
 pass-env/
 *~
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
