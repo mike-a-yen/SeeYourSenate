@@ -74,7 +74,7 @@ def build_models():
     this can be run whenever the db gets an update
     """
     members = db.session.query(Member).all()
-    p = Pool(4)
+    p = Pool(max(1,cpu_count()//2))
     results = p.map(build_save_model,members)
     return np.mean(results) == 1
 
