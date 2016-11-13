@@ -2,12 +2,19 @@ from app import BASE_DIR
 
 from app import db
 from app.models import *
+from app.member_utils import (member_vote_table,
+                              member_vote_subject_table,
+                              get_bill_subject,
+                              vote_map)
+from app.utils import (get_member)
+
 
 import pandas as pd
 import numpy as np
 import re
 import json
 import pickle
+from multiprocessing import Pool, cpu_count
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -21,7 +28,8 @@ stemmer = SnowballStemmer('english')
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords += ['amdt', 'amend', 'amendment',
               'bill', 'motion','title','act','samdt',
-              'table','year','cba','pn','con']
+              'table','year','cba','pn','con','sec',
+              'fy','use','used','uses']
 
 
 def tokenize_and_stem(text, stopwords=stopwords):
@@ -30,76 +38,13 @@ def tokenize_and_stem(text, stopwords=stopwords):
     stems = [stemmer.stem(t) for t in filtered_tokens]
     return stems
 
-def error_rate(predictions, actuals):
-    return np.mean(predictions != actuals)
-
-def document_title(doc):
-    if doc == 'null' or (type(doc)==float and np.isnan(doc)):
-        return ''
-    else:
-        return json.loads(doc).get('title','')
-    
-def error_rate(predictions, actuals):
-    return np.mean(predictions != actuals)
-
-
-def get_bill_text(memid):
-    bills = db.session.query(Bill)\
-                      .filter(Session.id==MemberSession.session_id)\
-                      .filter(MemberSession.member_id==memid)\
-                      .filter(Session.bill_id==Bill.id).all()
-    return list(map(lambda x: x.title if x.title != None else '', bills))
-
-
-def get_session_question(memid):
-    sessions = db.session.query(Session.question)\
-                         .filter(Session.id==MemberSession.session_id)\
-                         .filter(MemberSession.member_id==memid).all()
-    questions = list(map(lambda x: x[0],sessions))
-    return questions
-
-
-def get_session_subject(memid):
-    sessions = db.session.query(Session.subject)\
-                         .filter(Session.id==MemberSession.session_id)\
-                         .filter(MemberSession.member_id==memid).all()
-    subjects = list(map(lambda x: x[0],sessions))
-    return subjects
-
-
-def get_decision_text(memid):
-    bill = get_bill_text(memid)
-    question = get_session_question(memid)
-    subject = get_session_subject(memid)
-    assert len(bill)==len(question)
-    assert len(question)==len(subject)
-    return list(zip(bill, question, subject))
-
-
-def get_vote_history(memid):
-        votes = db.session.query(MemberSession.vote)\
-                .filter_by(member_id=memid).all()
-        return list(map(lambda x: x[0],votes))
-
-def vote_map(vote, default=0):
-    if vote == 'Yea':
-        return 1
-    elif vote == 'Nay':
-        return 0
-    else:
-        return default
-            
 def build_model(memid):
     """Build a knn model for each member
     member is a database Member object
     """
-    df = pd.DataFrame(get_decision_text(memid),columns=['title','question','subject'])
-    df['vote'] = get_vote_history(memid)
-    df['body'] = df['title'].str.cat(df['question'],sep=' ').str.cat(df['subject'],sep=' ')
-    df['body'] = df['body'].apply(lambda x: re.sub("\d+", "", x))
-    df['result'] = df['vote'].apply(vote_map)
+    df = member_vote_table(memid)
     
-    tfidf = TfidfVectorizer(max_features=10000,
+    tfidf = TfidfVectorizer(max_features=1000,
                             stop_words=stopwords,
                             use_idf=True,
                             tokenizer=None,
@@ -114,14 +59,14 @@ def build_model(memid):
 
 def build_save_model(member):
     print(member.first_name, member.last_name)
-    memid = member.id
+    memid = member.member_id
     member.nn_model_path = 'data/nn_models/'+memid+'.pklb'
     member.vectorizer_path = 'data/vectorizers/'+memid+'.pklb'
     db.session.commit()
     clf, tfidf = build_model(memid)
     
     pickle.dump(clf,open(member.nn_model_path,'wb'))
-    pickle.dump(tfidf,open(member.vectorizer_path,'wb'))  
+    pickle.dump(tfidf,open(member.vectorizer_path,'wb'))
     return True
     
 def build_models():
@@ -129,5 +74,29 @@ def build_models():
     this can be run whenever the db gets an update
     """
     members = db.session.query(Member).all()
-    results = [build_save_model(member) for member in members]
+    p = Pool(4)
+    results = p.map(build_save_model,members)
     return np.mean(results) == 1
+
+def get_subject_votes(memid):
+    
+    df = pd.DataFrame(list(zip(subjects,votes)), columns=['subject','vote'])
+    return df
+
+def rank_subjects(memid):
+    df = member_vote_subject_table(memid)
+    df = df[df['vote'].isin(['Nay','Yea'])]
+    df['value'] = df['vote'].apply(vote_map)
+    group = df.groupby(['subject'],as_index=False)
+    agg = group.agg(['mean','count'])['value']\
+               .sort_values(['mean','count'],ascending=False)
+    return agg
+
+def positive_negative_subjects(memid,wiggle_room=0.1):
+    ranked = rank_subjects(memid)
+    positive = ranked[ranked['mean']>=1-wiggle_room]
+    negative = ranked[ranked['mean']<=wiggle_room]
+    return list(positive.index),list(negative.index)
+
+if __name__ == '__main__':
+    build_models()

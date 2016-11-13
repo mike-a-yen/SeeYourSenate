@@ -31,13 +31,23 @@ def get_random_member():
     return member
 
 def get_senate(congress=114):
-    members = db.session.query(Member).distinct(Member.id)\
+    members = db.session.query(Member).distinct(Member.member_id)\
                         .filter(Session.chamber=='s')\
                         .filter(Session.congress_id==congress)\
-                        .filter(Session.id==MemberSession.session_id)\
-                        .filter(Member.id==MemberSession.member_id).all()
+                        .filter(Session.session_id==MemberSession.session_id)\
+                        .filter(Member.member_id==MemberSession.member_id).all()
     return members
-    
+
+def get_member(memid):
+    member = db.session.query(Member)\
+             .filter_by(member_id=memid).first()
+    return member
+
+def get_active_bills():
+    bills = db.session.query(Bill)\
+                      .filter_by(active=1).all()
+    return bills
+
 def merge_dicts(list_of_dicts):
     new = {}
     for d in list_of_dicts:

@@ -4,19 +4,21 @@ from datetime import datetime
 class Congress(db.Model):
     __tablename__ = 'congress'
     congress_id = db.Column('congress_id',db.Integer,primary_key=True)
-    
+
     def __init__(self, congress_id):
         self.congress_id = congress_id
 
 class Session(db.Model):
     __tablename__ = 'session'
-    id = db.Column('session_id',db.Integer, primary_key=True)
+    session_id = db.Column('session_id',db.Integer, primary_key=True)
     congress_id = db.Column('congress_id',
                             db.ForeignKey('congress.congress_id'))
+    
     year = db.Column('year', db.Integer)
     number = db.Column('number', db.Integer)
     chamber = db.Column('chamber', db.String(20))
     date = db.Column('date', db.DateTime)
+    
     bill_id = db.Column('bill_id',db.ForeignKey('bill.bill_id'))
     question = db.Column('question', db.String(240))
     subject = db.Column('subject', db.String(240))
@@ -42,25 +44,44 @@ class Session(db.Model):
 
 class Bill(db.Model):
     __tablename__ = 'bill'
-    id = db.Column('bill_id',db.Integer, primary_key=True)
+
+    bill_id = db.Column('bill_id',db.String(20), primary_key=True)
+    congress_id = db.Column('congress_id',db.ForeignKey('congress.congress_id'))
     type = db.Column('type', db.String(80))
+    number = db.Column('number',db.Integer)
     title = db.Column('title',db.String(240))
-    purpose = db.Column('purpose', db.String(240))
-    bill_text_path = db.Column('bill_text_path',db.String(240))
+    top_subject = db.Column('top_subject',db.String(80))
+    text = db.Column('text',db.Text)
+    active = db.Column('active',db.Boolean)
 
-    def __init__(self, type, title, purpose, bill_text_path):
+    def __init__(self, bill_id, congress_id, type, number,
+                 title, top_subject, text, active=False):
+
+        self.bill_id = bill_id
+        self.congress_id = congress_id 
         self.type = type
+        self.number = number
         self.title = title
-        self.purpose = purpose
-        self.bill_text_path = bill_text_path
+        self.top_subject = top_subject
+        self.text = text
+        self.active = active
 
+class BillSubject(db.Model):
+    __tablename__ = 'billsubject'
+    id = db.Column('id',db.Integer,primary_key=True)
+    bill_id = db.Column('bill_id',db.ForeignKey('bill.bill_id'))
+    subject = db.Column('subject',db.String(120))
+
+    def __init__(self, bill_id, subject):
+        self.bill_id = bill_id
+        self.subject = subject
 
 class MemberSession(db.Model):
     __tablename__ = 'membersession'
     id = db.Column('id', db.Integer, primary_key=True)
     session_id = db.Column('session_id', db.ForeignKey('session.session_id'))
     member_id = db.Column('member_id', db.ForeignKey('member.member_id'))
-    vote = db.Column('vote', db.Integer)
+    vote = db.Column('vote', db.String(20))
 
     def __init__(self, session_id, member_id, vote):
         self.session_id = session_id
@@ -70,7 +91,7 @@ class MemberSession(db.Model):
         
 class Member(db.Model):
     __tablename__ = 'member'
-    id = db.Column('member_id',db.String(20), primary_key=True)
+    member_id = db.Column('member_id',db.String(20), primary_key=True)
     first_name = db.Column('first',db.String(40))
     last_name = db.Column('last',db.String(40))
     display_name = db.Column('display',db.String(80))
@@ -79,9 +100,9 @@ class Member(db.Model):
     nn_model_path = db.Column('nn_model_path',db.String(40))
     vectorizer_path = db.Column('vectorizer_path',db.String(40))
 
-    def __init__(self, id, first, last, display, state, party,
+    def __init__(self, member_id, first, last, display, state, party,
                  nn_model_path=None, vectorizer_path=None):
-        self.id = id
+        self.member_id = member_id
         self.first_name = first
         self.last_name = last
         self.display_name = display

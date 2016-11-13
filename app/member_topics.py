@@ -1,8 +1,6 @@
 from app import db, BASE_DIR
 from app.models import *
-from app.build_models import (get_decision_text,
-                              get_vote_history,
-                              vote_map)
+from app.member_utils import member_vote_table
 from app.utils import merge_dicts
 
 import os
@@ -19,7 +17,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def load_vectorizer(memid):
-    member = db.session.query(Member).filter_by(id=memid).first()
+    member = db.session.query(Member).filter_by(member_id=memid).first()
     path = os.path.join(BASE_DIR,member.vectorizer_path)
     return pickle.load(open(path,'rb'))
 
@@ -42,29 +40,28 @@ def get_word_freq_from_centroid(centroid, features, n):
                  for ind in ordered_centroid[:n]}
     return word_freq
 
-def member_vote_table(memid):
-    text = get_decision_text(memid)
-    df = pd.DataFrame(text,columns=['title','question','subject'])
-    df['vote'] = get_vote_history(memid)
-    df['body'] = df['title'].str.cat(df['question'],sep=' ')\
-                                .str.cat(df['subject'],sep=' ')
-    df['body'] = df['body'].apply(lambda x: re.sub("\d+", "", x))
-    df['result'] = df['vote'].apply(vote_map)
-    return df
-
 def vote_topic_freq(memid):
     df = member_vote_table(memid)
+    print('vote record loaded')
     vectorizer = load_vectorizer(memid)
+    print('vectorizer loaded')
     features = vectorizer.get_feature_names()
-    votes = df['vote'].unique()
+    votes = ['Nay','Yea']
+    print('votes',votes)
     topic_words = {vote:set() for vote in votes}
+    print('Start loop')
     for vote in votes:
         sub = df[df['vote']==vote]
+        print('got',vote,'votes')
         matrix = vectorizer.fit_transform(sub['body'])
-        kmeans = KMeans( min(8,len(sub)) )
+        print('Start KMeans',vote)
+        k = len(sub['subject'].unique())
+        print(k,'clusters')
+        kmeans = KMeans(k)
         kmeans.fit_transform(matrix)
-        sub['cluster'] = kmeans.labels_.tolist()
+        print('Fit KMeans',vote)
         topic_freq = [get_word_freq_from_centroid(centroid, features, 10)\
                       for centroid in kmeans.cluster_centers_]
         topic_words[vote] = merge_dicts(topic_freq)
     return topic_words
+

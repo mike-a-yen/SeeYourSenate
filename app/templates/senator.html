@@ -59,10 +59,17 @@
 	</div>
 	<img src="{{ yay_cloud }}"
 	     class="img-responsive" alt="Vote 'Yay' Words">
-	<p>Key words extracted from the "Yay"
-	  votes of senator {{ last_name }}.
-	  These words were frequently mentioned
-	  in bills {{ last_name }} voted in favor of.</p>
+	<table class="table table-hover">
+	  <thead class="thead-inverse">
+	    <th>Subjects Voted For
+	    <th>Times
+	  </thead>
+	      {%- for row in yay_subjects %}
+	      <tr class={{ "success" if row.done }}>
+		<td>{{ row.subject }}
+		<td>{{ row.count }}
+		{%- endfor %}
+	</table>
       </div>    
       <div class="col-xs-6">
 	<div class="header text-center">
@@ -70,12 +77,20 @@
 	</div>
 	<img src="{{ nay_cloud }}"
 	     class="img-responsive" alt="Vote 'Nay' Words">
-	<p>Key words extracted from the "Nay"
-	  votes of senator {{ last_name }}.
-	  These words were frequently mentioned
-	  in bills {{ last_name }} voted against.</p>
+	<table class="table table-hover">
+	  <thead class="thead-inverse">
+	    <th>Subjects Voted Against
+	    <th>Times
+	  </thead>
+	      {%- for row in nay_subjects %}
+	      <tr class={{ "success" if row.done }}>
+		<td>{{ row.subject }}
+		<td>{{ row.count }}
+		{%- endfor %}
+	</table>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}
