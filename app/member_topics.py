@@ -1,4 +1,4 @@
-from app import db, BASE_DIR
+from app import app,db, BASE_DIR
 from app.models import *
 from app.member_utils import member_vote_table
 from app.utils import merge_dicts
@@ -9,6 +9,8 @@ import numpy as np
 import re
 import json
 import pickle
+
+from sqlalchemy import func
 
 from sklearn.decomposition import TruncatedSVD, PCA
 from sklearn.cluster import KMeans
@@ -41,27 +43,20 @@ def get_word_freq_from_centroid(centroid, features, n):
     return word_freq
 
 def vote_topic_freq(memid):
-    df = member_vote_table(memid)
-    print('vote record loaded')
-    vectorizer = load_vectorizer(memid)
-    print('vectorizer loaded')
-    features = vectorizer.get_feature_names()
-    votes = ['Nay','Yea']
-    print('votes',votes)
-    topic_words = {vote:set() for vote in votes}
-    print('Start loop')
-    for vote in votes:
-        sub = df[df['vote']==vote]
-        print('got',vote,'votes')
-        matrix = vectorizer.fit_transform(sub['body'])
-        print('Start KMeans',vote)
-        k = len(sub['subject'].unique())
-        print(k,'clusters')
-        kmeans = KMeans(k)
-        kmeans.fit_transform(matrix)
-        print('Fit KMeans',vote)
-        topic_freq = [get_word_freq_from_centroid(centroid, features, 10)\
-                      for centroid in kmeans.cluster_centers_]
-        topic_words[vote] = merge_dicts(topic_freq)
-    return topic_words
+    query = db.session.query(BillSubject.subject,MemberSession.vote, func.count())\
+                      .filter(Bill.bill_id==BillSubject.bill_id)\
+                      .filter(Session.bill_id==Bill.bill_id)\
+                      .filter(Session.session_id==MemberSession.session_id)\
+                      .filter(MemberSession.member_id==memid)\
+                      .group_by(BillSubject.subject,MemberSession.vote)
+    df = pd.read_sql(query.statement,app.config['SQLALCHEMY_DATABASE_URI'])
+    print('Query done')
+    votes = ['Yea','Nay']
+    df = df[df['vote'].isin(votes)]
+    groups = df.groupby(['vote','subject'],as_index=False).sum()
+    yay = groups[groups['vote']=='Yea']
+    nay = groups[groups['vote']=='Nay']
+    vote_words = {'Yea':yay['subject'].str.cat(sep=' '),
+                  'Nay':nay['subject'].str.cat(sep=' ')}
+    return vote_words
 

@@ -90,13 +90,21 @@ def rank_subjects(memid):
     group = df.groupby(['subject'],as_index=False)
     agg = group.agg(['mean','count'])['value']\
                .sort_values(['mean','count'],ascending=False)
-    return agg
+    agg['for_vote'] = (agg['mean']*agg['count']).astype(int)
+    agg['against_vote'] = agg['count']-agg['for_vote']
+    agg = agg.round({'mean':2})
+    return agg.reset_index(0)
 
-def positive_negative_subjects(memid,wiggle_room=0.1):
+def positive_negative_subjects(memid,wiggle_room=0.5,limit=5):
     ranked = rank_subjects(memid)
-    positive = ranked[ranked['mean']>=1-wiggle_room]
-    negative = ranked[ranked['mean']<=wiggle_room]
-    return list(positive.index),list(negative.index)
+    positive = ranked[ranked['mean']>=1-wiggle_room].sort_values(['mean','for_vote'],ascending=False)
+    negative = ranked[ranked['mean']<=wiggle_room].sort_values(['mean','against_vote'],ascending=[True,False])
+    positive_counts = positive[['subject','for_vote']].iloc[0:limit]
+    positive_counts.columns=['subject','count']
+    negative_counts = negative[['subject','against_vote']].iloc[0:limit]
+    negative_counts.columns=['subject','count']
+    return (positive_counts.T.to_dict().values(),
+            negative_counts.T.to_dict().values())
 
 if __name__ == '__main__':
     build_models()

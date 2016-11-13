@@ -41,15 +41,15 @@ def senator():
         
     memid = member.member_id
     print('member id:',memid)
-    topic = vote_topic_freq(memid)
-    print(topic)
-    clouds = {key:make_word_cloud(words,key)\
-              for key,words in topic.items()}
+    vote_words = vote_topic_freq(memid)
+    
+    clouds = {key:make_word_cloud(words.lower(),key)\
+              for key,words in vote_words.items()}
     # save clouds
     paths = {key:save_member_cloud(fig,member,key)\
              for key,fig in clouds.items()}
 
-    yay_subjects, nay_subjects = positive_negative_subjects(memid,wiggle_room=0.2)
+    yay_subjects, nay_subjects = positive_negative_subjects(memid)
     return flask.render_template('senator.html',
                                  senators=display_names,
                                  first_name=member.first_name,

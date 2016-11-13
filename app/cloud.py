@@ -42,7 +42,7 @@ def save_member_cloud(fig,member,key):
     fig.savefig(BASE_DIR+'/app'+path, bbox_inches='tight')
     return path
 
-def make_word_cloud(word_freq, type='Yea'):
+def make_word_cloud(words, type='Yea'):
     """Make a word cloud from a list of words"""
     if type =='Yea':
         thumb = Image.open(BASE_DIR+'/app/static/img/thumbs-up.png')
@@ -63,7 +63,7 @@ def make_word_cloud(word_freq, type='Yea'):
                    mask=mask,
                    stopwords=STOPWORDS)
     #wc = wc.generate_from_frequencies(word_freq)
-    wc = wc.generate(' '.join(word_freq.keys()))
+    wc = wc.generate(words)
     wc = wc.recolor(color_func=color_func)
     fig = cloud_to_fig(wc)
     return fig
