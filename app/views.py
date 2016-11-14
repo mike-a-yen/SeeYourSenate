@@ -59,14 +59,15 @@ def senator():
 
 @app.route('/active')
 def active():
-    active_bills = get_active_bills()
-    votes = senate_prediction(get_senate(),active_bills)
-    aggregate_votes = np.apply_along_axis(np.bincount,0,votes)
-    bill_summary = list(zip(active_bills,aggregate_votes.T))
-    active_bills = [{'bill_id':bill.type.upper()+str(bill.number),
-                     'top_subject':bill.top_subject,
-                     'votes_for':vote[1],
-                     'votes_against':vote[0],
-                     'passed':vote[1]>vote[0]} for bill,vote in bill_summary]
+    #active_bills = get_active_bills()
+    #votes = senate_prediction(get_senate(),active_bills)
+    #aggregate_votes = np.apply_along_axis(np.bincount,0,votes)
+    #bill_summary = list(zip(active_bills,aggregate_votes.T))
+    #active_bills = [{'bill_id':bill.type.upper()+str(bill.number),
+    #                 'top_subject':bill.top_subject,
+    #                 'votes_for':vote[1],
+    #                 'votes_against':vote[0],
+    #                 'passed':vote[1]>vote[0]} for bill,vote in bill_summary]
+    active_bills = pickle.load(open(os.path.join(BASE_DIR,'data/active_bill_predictions.pklb'),'rb'))
     return flask.render_template('active_bills.html',
                                  active_bills=active_bills)
