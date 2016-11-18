@@ -4,7 +4,7 @@ from app import db
 from app.models import *
 from app.member_utils import (member_vote_table,
                               member_vote_subject_table,
-                              get_bill_subject,
+                              get_bill_top_subject,
                               vote_map)
 from app.utils import (get_member)
 
@@ -78,8 +78,7 @@ def build_models():
     results = p.map(build_save_model,members)
     return np.mean(results) == 1
 
-def get_subject_votes(memid):
-    
+def get_subject_votes(memid):    
     df = pd.DataFrame(list(zip(subjects,votes)), columns=['subject','vote'])
     return df
 
@@ -99,12 +98,17 @@ def positive_negative_subjects(memid,wiggle_room=0.5,limit=5):
     ranked = rank_subjects(memid)
     positive = ranked[ranked['mean']>=1-wiggle_room].sort_values(['mean','for_vote'],ascending=False)
     negative = ranked[ranked['mean']<=wiggle_room].sort_values(['mean','against_vote'],ascending=[True,False])
-    positive_counts = positive[['subject','for_vote']].iloc[0:limit]
-    positive_counts.columns=['subject','count']
-    negative_counts = negative[['subject','against_vote']].iloc[0:limit]
-    negative_counts.columns=['subject','count']
+    positive_counts = positive[['subject','for_vote','count']].iloc[0:limit]
+    positive_counts.columns=['subject','for_votes','total_votes']
+    negative_counts = negative[['subject','against_vote','count']].iloc[0:limit]
+    negative_counts.columns=['subject','against_votes','total_votes']
     return (positive_counts.T.to_dict().values(),
             negative_counts.T.to_dict().values())
+
+def voting_subject_record(memid):
+    ranked = rank_subjects(memid)
+    return ranked.T.to_dict().values()
+
 
 if __name__ == '__main__':
     build_models()
