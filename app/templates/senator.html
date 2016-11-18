@@ -74,33 +74,35 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-xs-12">
-      <table class="table table-striped">
-	<thead>
-	  <tr>
-	    <th>Subject
-	    <th>Yay votes
-	    <th>Nay votes
-	    <th>Times voted
-	    <th>In favor
-	  </tr>
-	</thead>
-	<tbody>
-	  {%- for row in subjects %}
-	  <tr class={{ "success" if row.done }}>
-	    <td>{{ row.subject }}
-	    <td>{{ row.for_vote }}
-	    <td>{{ row.against_vote }}
-	    <td>{{ row.count }}
-	      {% if row.for_vote>row.against_vote %}
-	    <td><img src="/static/img/green-thumb.png" width="16px">
-	      {% elif row.against_vote>row.for_vote%}
-	    <td><img src="/static/img/red-thumb.png" width="16px">
-	      {% else %}
-	    <td>
-	      {% endif %}
-	      {%- endfor %}
-	</tbody>
-      </table>
+      <div class="table-responsive">
+	<table class="table table-hover table-striped">
+	  <thead>
+	    <tr>
+	      <th>Subject
+	      <th>Yay votes
+	      <th>Nay votes
+	      <th>Times voted
+	      <th>In favor
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {%- for row in subjects %}
+	    <tr class={{ "success" if row.done }}>
+	      <td>{{ row.subject }}
+	      <td>{{ row.for_vote }}
+	      <td>{{ row.against_vote }}
+	      <td>{{ row.count }}
+		{% if row.for_vote>row.against_vote %}
+	      <td><img src="/static/img/green-thumb.png" width="16px">
+		{% elif row.against_vote>row.for_vote%}
+	      <td><img src="/static/img/red-thumb.png" width="16px">
+		{% else %}
+	      <td>
+		{% endif %}
+		{%- endfor %}
+	  </tbody>
+	</table>
+      </div>
     </div>
   </div>
 </div>
