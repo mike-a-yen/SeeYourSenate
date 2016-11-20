@@ -15,6 +15,7 @@ import re
 import json
 import pickle
 from multiprocessing import Pool, cpu_count
+from functools import partial
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -57,25 +58,34 @@ def build_model(memid):
     return clf, tfidf
 
 
-def build_save_model(member):
+def build_save_model(member,version):
     print(member.first_name, member.last_name)
     memid = member.member_id
-    member.nn_model_path = 'data/nn_models/'+memid+'.pklb'
-    member.vectorizer_path = 'data/vectorizers/'+memid+'.pklb'
-    db.session.commit()
+    member.nn_model_path = 'data/nn_models/v%s/%s.pklb'%(version,memid)
+    member.vectorizer_path = 'data/vectorizers/v%s/%s.pklb'%(version,memid)
     clf, tfidf = build_model(memid)
+
+    algorithm = re.search('([a-zA-Z0-9]+)',clf.__repr__()).group()
+    db_model = PredictionModel(memid,
+                               member.nn_model_path,
+                               algorithm,
+                               version)
     
     pickle.dump(clf,open(member.nn_model_path,'wb'))
     pickle.dump(tfidf,open(member.vectorizer_path,'wb'))
     return True
     
-def build_models():
+def build_models(version,members=None):
     """Build knn models for all members in DB
     this can be run whenever the db gets an update
     """
-    members = db.session.query(Member).all()
+    if members == None:
+        members = db.session.query(Member).all()
     p = Pool(max(1,cpu_count()//2))
-    results = p.map(build_save_model,members)
+
+    partial_save_model = partial(build_save_model, version=version)
+    
+    results = p.map(partial_save_model,members)
     return np.mean(results) == 1
 
 def get_subject_votes(memid):    

@@ -120,21 +120,24 @@ class BillPrediction(db.Model):
     passed = db.Column('passed',db.Boolean)
     model_id = db.Column('model_id',db.ForeignKey('predictionmodel.model_id'))
 
-    def __init__(self,bill_id,votes_for,votes_against,passed):
+    def __init__(self,bill_id,votes_for,votes_against,passed,model_id):
         self.bill_id = bill_id
         self.votes_for = votes_for
         self.votes_against = votes_against
         self.passed = passed
+        self.model_id = model_id
 
 class BillOutcome(db.Model):
     __tablename__ = 'billoutcome'
-    id = db.Column('id',db.Integer,primary_key=True)
+    billoutcome_id = db.Column('billoutcome_id',db.Integer,primary_key=True)
+    session_id = db.Column('session_id',db.ForeignKey('session.session_id'))
     bill_id = db.Column('bill_id',db.ForeignKey('bill.bill_id'))
     votes_for = db.Column('votes_for',db.Integer)
     votes_against = db.Column('votes_against',db.Integer)
     passed = db.Column('passed',db.Boolean)
 
-    def __init__(self,bill_id,votes_for,votes_against,passed):
+    def __init__(self,session_id,bill_id,votes_for,votes_against,passed):
+        self.session_id = session_id
         self.bill_id = bill_id
         self.votes_for = votes_for
         self.votes_against = votes_against
@@ -144,11 +147,13 @@ class BillOutcome(db.Model):
 class PredictionModel(db.Model):
     __tablename__ = 'predictionmodel'
     model_id = db.Column('model_id',db.Integer,primary_key=True)
+    member_id = db.Column('member_id',db.ForgeignKey('member.member_id'))
     model_path = db.Column('model_path',db.String(80))
     algorithm = db.Column('algorithm',db.String(20))
     version = db.Column('version',db.Integer)
 
-    def __init__(self,model_path,algorithm,version):
+    def __init__(self,member_id,model_path,algorithm,version):
+        self.member_id = member_id
         self.model_path = model_path
         self.algorithm = algorithm
         self.version = version
