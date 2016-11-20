@@ -147,7 +147,7 @@ class BillOutcome(db.Model):
 class PredictionModel(db.Model):
     __tablename__ = 'predictionmodel'
     model_id = db.Column('model_id',db.Integer,primary_key=True)
-    member_id = db.Column('member_id',db.ForgeignKey('member.member_id'))
+    member_id = db.Column('member_id',db.ForeignKey('member.member_id'))
     model_path = db.Column('model_path',db.String(80))
     algorithm = db.Column('algorithm',db.String(20))
     version = db.Column('version',db.Integer)
