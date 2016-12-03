@@ -4,6 +4,7 @@ data/active_bills/
 analyze/
 app/templates/*.html~
 app/static/word_clouds/*
+app/*.pyc
 tmp/*.BACK
 .DS_Store
 __pycache__/
