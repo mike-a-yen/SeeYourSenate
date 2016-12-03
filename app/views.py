@@ -1,7 +1,7 @@
 from app import app, db, BASE_DIR
 from app.models import *
 from app.member_topics import vote_topic_freq
-from app.build_models import positive_negative_subjects
+from app.build_models import positive_negative_subjects, voting_subject_record
 from app.model_prediction import senate_prediction
 from app.utils import (get_random_member,
                        get_senate,
@@ -45,7 +45,8 @@ def senator():
     print('member id:',memid)
     clouds = make_word_cloud(member)
 
-    yay_subjects, nay_subjects = positive_negative_subjects(memid)
+    #yay_subjects, nay_subjects = positive_negative_subjects(memid)
+    subjects = voting_subject_record(memid)
     return flask.render_template('senator.html',
                                  senators=display_names,
                                  first_name=member.first_name,
@@ -54,20 +55,12 @@ def senator():
                                  party=member.party,
                                  yay_cloud=clouds['Yea'],
                                  nay_cloud=clouds['Nay'],
-                                 yay_subjects=yay_subjects,
-                                 nay_subjects=nay_subjects)
+                                 subjects=subjects)
 
 @app.route('/active')
 def active():
-    #active_bills = get_active_bills()
-    #votes = senate_prediction(get_senate(),active_bills)
-    #aggregate_votes = np.apply_along_axis(np.bincount,0,votes)
-    #bill_summary = list(zip(active_bills,aggregate_votes.T))
-    #active_bills = [{'bill_id':bill.type.upper()+str(bill.number),
-    #                 'top_subject':bill.top_subject,
-    #                 'votes_for':vote[1],
-    #                 'votes_against':vote[0],
-    #                 'passed':vote[1]>vote[0]} for bill,vote in bill_summary]
-    active_bills = pickle.load(open(os.path.join(BASE_DIR,'data/active_bill_predictions.pklb'),'rb'))
+    active_bills = pickle.load(open(os.path.join(BASE_DIR,
+                                    'data/active_bill_predictions.pklb'),
+                                    'rb'))
     return flask.render_template('active_bills.html',
                                  active_bills=active_bills)
