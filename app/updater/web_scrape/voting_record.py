@@ -23,14 +23,14 @@ def get_all_number_links(soup):
             number_links.append((number,link))
     return number_links
 
-def get_all_senate_links(soup):
-    senate_links = []
+def get_all_session_links(soup):
+    session_links = []
     for link in soup.find_all('a'):
         s_search = re.search('s[0-9]+',link.text)
         if s_search:
             code = s_search.group()
-            senate_links.append(link['href'])
-    return senate_links
+            session_links.append(code,link)
+    return session_links
 
 class LatestVotingRecord(object):
     def __init__(self):
@@ -58,8 +58,21 @@ class LatestVotingRecord(object):
     def get_new_senate_sessions(self):
         latest_voting_year_url = self.get_latest_voting_year_url()
         year = latest_voting_url.split('/')[-1]
+        
+        page = request.urlopen(latest_voting_year_url)
+        soup = BeautifulSoup(page.read,'html.parser')
+        # sessions on the web page
+        current_sessions = get_all_session_links(soup)
+
+        # sessions in the db
         db_sessions = db.session.query(Session)\
                       .filter_by(year=year).all()
-        db_session_codes = [s.chamber+str(s.number) for s in db_sessions]
-        
+        old_sessions = [s.chamber+str(s.number) for s in db_sessions]
+        return [(code,link) for code,link in current_sessions if code not in old_sessions]
+
+    def scrape_new_sessions(self):
+        year_url = self.get_latest_voting_year_url()
+        new_sessions = self.get_new_senate_sessions()
+        go_to_urls = [urlparse.urljoin(year_url,link['href'],'data.json')\
+                      for code,link in new_sessions]
         
