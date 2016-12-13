@@ -96,7 +96,8 @@ def parse_bill_ids(bills):
                             bill_ids.append(bill_id)
     return bill_ids
 
-if __name__ == '__main__':
+
+def get_active_bill_data():
     page = request.urlopen(base_url)
     bs = BeautifulSoup(page.read(),'lxml')
 
@@ -133,4 +134,7 @@ if __name__ == '__main__':
                                 'data/active_bills',
                                 bill_id+'.json')
         json.dump(bill_data,open(filename))
-        
+    return 'Success!'
+
+if __name__ == '__main__':
+    get_active_bill_data()
