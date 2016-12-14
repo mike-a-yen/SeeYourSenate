@@ -35,32 +35,34 @@ def get_all_session_links(soup):
 class LatestVotingRecord(object):
     def __init__(self):
         self.base_url = 'https://www.govtrack.us/data/congress/'
-        self.base_page = request.urlopen(self.base_url)
         
     def get_latest_congress_url(self):
         """Return the url of the latest congress
         voting records
         """
-        soup = BeautifulSoup(self.base_page.read(),'html.parser')
+        soup = BeautifulSoup(request.urlopen(self.base_url).read(),
+                             'lxml-xml')
         congresses = get_all_number_links(soup)
         sorted_congresses = sorted(congresses,key=lambda x:x[0])
         latest_congress = sorted_congresses[-1]
         return urlparse.urljoin(base_url,latest_congress[1]['href'])
 
     def get_latest_voting_year_url(self):
-        url = self.get_latest_congress_url()
+        url = urlparse.urljoin(self.get_latest_congress_url(),
+                               'votes')
+        print(url)
         page = request.urlopen(url)
-        soup = BeautifulSoup(page.read(),'html.parser')
+        soup = BeautifulSoup(page.read(),'lxml-xml')
         years = sorted(get_all_number_links(soup),key=lambda x: x[0])
         latest_year = years[-1]
-        return urlparse.urljoin(url,latest_year['href'])
+        return urlparse.urljoin(url,'votes',latest_year[1]['href'])
 
     def get_new_senate_sessions(self):
         latest_voting_year_url = self.get_latest_voting_year_url()
-        year = latest_voting_url.split('/')[-1]
+        year = latest_voting_year_url.split('/')[-1]
         
         page = request.urlopen(latest_voting_year_url)
-        soup = BeautifulSoup(page.read,'html.parser')
+        soup = BeautifulSoup(page.read(),'lxml-xml')
         # sessions on the web page
         current_sessions = get_all_session_links(soup)
 
@@ -75,4 +77,4 @@ class LatestVotingRecord(object):
         new_sessions = self.get_new_senate_sessions()
         go_to_urls = [urlparse.urljoin(year_url,link['href'],'data.json')\
                       for code,link in new_sessions]
-        
+        #TODO: parse json urls into DB data
