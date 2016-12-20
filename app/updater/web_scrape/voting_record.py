@@ -51,7 +51,7 @@ def get_latest_voting_year_url():
     url = os.path.join(get_latest_congress_url(),
                        'votes')
     page = request.urlopen(url)
-    soup = BeautifulSoup(page.read(),'lxml-xml')
+    soup = BeautifulSoup(page.read(),'html.parser')
     years = sorted(get_all_number_links(soup),key=lambda x: x[0])
     latest_year = years[-1]
     return os.path.join(url,latest_year[1]['href'])
@@ -63,7 +63,6 @@ def get_new_senate_sessions():
     soup = BeautifulSoup(page.read(),'html.parser')
     # sessions on the web page
     current_sessions = get_all_session_links(soup)
-
     # sessions in the db
     db_sessions = db.session.query(Session)\
                             .filter_by(year=year).all()
@@ -75,11 +74,11 @@ def scrape_new_sessions():
     new_sessions = get_new_senate_sessions()
     urls = [os.path.join(year_url,link['href'],'data.json')\
             for code,link in new_sessions]
-
+    
     # filter urls by bills already in DB
     # TODO: refactor
     go_to_urls = []
-    bill_ids = [x.split('/')[-2]+'-'+x.split('/')[-5] for x in go_to_urls]
+    bill_ids = [x.split('/')[-2]+'-'+x.split('/')[-5] for x in urls]
     for url,bill_id in zip(urls,bill_ids):
         if db.session.query(Bill).filter_by(bill_id=bill_id).first():
             continue
@@ -94,13 +93,13 @@ def visit_new_sessions():
             
 def populate_db():
     for data in visit_new_sessions():
-        congress = data.get('congress')
+        conid = data.get('congress')
         conquery = db.session.query(Congress).filter_by(congress_id=conid).all()
         if not conquery:
-            print('New Congress',conid)
+            print('New Congress',conid,type(conid))
             congress = Congress(conid)
-            #db.session.add(congress)
-            #db.session.commit()
+            db.session.add(congress)
+            db.session.commit()
                 
         date = datetime.strptime(''.join(data['date'].split('-')[:-1]),'%Y%m%dT%H:%M:%S')
         year = date.year
@@ -116,13 +115,16 @@ def populate_db():
         bill = data.get('bill')
         if bill:
             bill_congress = bill.get('congress')
-            bill_data = self.get_bill_json(bill)
+            bill_data = get_bill_json(bill)
             bill_type = bill.get('type')
             bill_number = bill.get('number')
             bill_id = bill_type+str(bill_number)+'-'+str(bill_congress)
             bill_title = bill_data.get('official_title')
             bill_topsubject = bill_data.get('subjects_top_term')
-            bill_text = bill_data.get('summary',{'text':None})['text']
+            summary = bill_data.get('summary')
+            if summary == None:
+                summary = {'text':None}
+            bill_text = summary['text']
             bill_subjects = bill_data.get('subjects',[])
             
             billquery = db.session.query(Bill).filter_by(bill_id=bill_id).all()
@@ -131,18 +133,18 @@ def populate_db():
                 db_bill = Bill(bill_id, bill_congress,
                                bill_type, bill_number,
                                bill_title, bill_topsubject, bill_text)
-                #db.session.add(db_bill)
+                db.session.add(db_bill)
                 for sub in bill_subjects:
                     db_subject = BillSubject(bill_id, sub)
-                    #db.session.add(db_subject)
+                    db.session.add(db_subject)
 
             session = Session(conid, year, number, chamber, date,
                               bill_id, question, subject, category,
                               requires, passed)
-            #db.session.add(session)
-            #db.session.commit()
+            db.session.add(session)
+            db.session.commit()
 
-            for vote,people in raw['votes'].items():
+            for vote,people in data['votes'].items():
                 for person in people:
                     if person == 'VP': continue
                     memid = person['id']
@@ -155,17 +157,17 @@ def populate_db():
                     if not memquery:
                         print('New Member :',display)
                         member = Member(memid, first, last, display, state, party)
-                        #db.session.add(member)
-                        #db.session.commit()
+                        db.session.add(member)
+                        db.session.commit()
                     
                     memsess = MemberSession(session.session_id, memid, vote)
-                    #db.session.add(memsess)
-                    #db.session.commit()
+                    db.session.add(memsess)
+                    db.session.commit()
         
 
 def url_to_json(url,save=False):
     datapage = request.urlopen(url)
-    data = json.loads(datapage.read())
+    data = json.load(reader(datapage))
     bill_id = url.split('/')[-2]+'-'+url.split('/')[-5]
     if save:
         json.dumps(data,open('data/bills/'++'.json'))
@@ -177,7 +179,7 @@ def bill_type(self,bill_id):
 def bill_number(self,bill_id):
     return re.findall('[0-9]+',bill_id)[0]
 
-def get_bill_json(self,bill,save=False):
+def get_bill_json(bill,save=False):
     """bill is a dictionary"""
     base_url = 'https://www.govtrack.us/data/congress/'
     type = bill['type']
@@ -196,3 +198,5 @@ def get_bill_json(self,bill,save=False):
     return data
                                     
                                     
+if __name__ == '__main__':
+    populate_db()

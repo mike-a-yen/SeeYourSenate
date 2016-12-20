@@ -6,6 +6,7 @@ app/templates/*.html~
 app/static/word_clouds/*
 app/*.pyc
 tmp/*.BACK
+tmp/dev*.db
 .DS_Store
 __pycache__/
 app/__pycache__/
