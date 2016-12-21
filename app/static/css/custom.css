@@ -2,3 +2,10 @@
     border-radius: 0px;
     background-color: #000000;
 }
+
+.pre-scrollable{
+    max-height: 600px;
+}
+
+
+
