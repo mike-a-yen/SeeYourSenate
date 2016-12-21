@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>{{display_title}}</h2>
+      <h3>{{bill.title}}</h3>
+      <h4>Top Subject: {{bill.top_subject}}</h4>
+    </div>
+  </div>
+</div>
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-6">
+      <div class="header">
+	<h4>Summary</h4>
+      </div>
+      <div class="col-xs-12 pre-scrollable">
+	<p>{{bill.text}}</p>
+      </div>
+    </div>
+
+    <div class="col-xs-6">
+      <div class="header">
+	<h4>Voting Record</h4>
+      </div>
+      <div class="col-xs-12 pre-scrollable">
+	<table class="table table-hover tabel-fixed table-striped">
+	  <thead>
+	    <tr>
+	      <th>Senator</th>
+	      <th>State</th>
+	      <th>Party</th>
+	      <th align="center">Vote</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {%- for vote in votes %}
+	    <tr>
+	      <td>{{ vote.first_name }} {{vote.last_name}}</td>
+	      <td>{{vote.state}}</td>
+	      <td>{{ vote.party }}</td>
+	      {% if vote.vote %}
+	      <td align="center"><img src="/static/img/checkmark.png"
+				      width="16px"></td>
+	      {% else %}
+	      <td align="center"><img src="/static/img/xmark.png"
+				      width="16px"></td>
+	      {% endif %}
+	    </tr>
+	    {%- endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
