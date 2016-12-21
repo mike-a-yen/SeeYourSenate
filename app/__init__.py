@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-local_db = BASE_DIR+'/tmp/dev_congress.db'
+local_db = BASE_DIR+'/tmp/congress.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'+local_db
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
