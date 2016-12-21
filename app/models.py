@@ -127,6 +127,20 @@ class BillPrediction(db.Model):
         self.passed = passed
         self.model_id = model_id
 
+class VotePrecition(db.Model):
+    __tablename__ = 'voteprediction'
+    id = db.Column('id',db.Integer,primary_key=True)
+    bill_id = db.Column('bill_id',db.ForeignKey('bill.bill_id'))
+    member_id = db.Column('member_id',db.ForeignKey('member.member_id'))
+    predicted_vote = db.Column('predicted_vote',db.Integer)
+    model_id = db.Column('model_id',db.ForeignKey('predictionmodel.model_id'))
+
+    def __init__(self,bill_id,member_id,predicted_vote,model_id):
+        self.bill_id = bill_id
+        self.member_id = member_id
+        self.predicted_vote = predicted_vote
+        self.model_id = model_id
+        
 class BillOutcome(db.Model):
     __tablename__ = 'billoutcome'
     billoutcome_id = db.Column('billoutcome_id',db.Integer,primary_key=True)
