@@ -8,7 +8,7 @@ from app.member_utils import (member_vote_table,
                               vote_map)
 from app.utils import (get_member)
 
-
+import os
 import pandas as pd
 import numpy as np
 import re
@@ -61,15 +61,22 @@ def build_model(memid):
 def build_save_model(member,version):
     print(member.first_name, member.last_name)
     memid = member.member_id
+    
+    if not os.path.exists('data/nn_models/v%s'%version):
+        os.mkdir('data/nn_models/v%s'%version)
+    if not os.path.exists('data/vectorizers/v%s'%version):
+        os.mkdir('data/vectorizers/v%s'%version)
     member.nn_model_path = 'data/nn_models/v%s/%s.pklb'%(version,memid)
     member.vectorizer_path = 'data/vectorizers/v%s/%s.pklb'%(version,memid)
-    clf, tfidf = build_model(memid)
 
+    clf, tfidf = build_model(memid)
     algorithm = re.search('([a-zA-Z0-9]+)',clf.__repr__()).group()
     db_model = PredictionModel(memid,
                                member.nn_model_path,
                                algorithm,
                                version)
+    db.session.add(db_model)
+    db.session.commit()
     
     pickle.dump(clf,open(member.nn_model_path,'wb'))
     pickle.dump(tfidf,open(member.vectorizer_path,'wb'))
@@ -81,7 +88,7 @@ def build_models(version,members=None):
     """
     if members == None:
         members = db.session.query(Member).all()
-    p = Pool(max(1,cpu_count()//2))
+    p = Pool(1)
 
     partial_save_model = partial(build_save_model, version=version)
     
