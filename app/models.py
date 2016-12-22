@@ -4,10 +4,12 @@ from datetime import datetime
 class Congress(db.Model):
     __tablename__ = 'congress'
     congress_id = db.Column('congress_id',db.Integer,primary_key=True)
-
-    def __init__(self, congress_id):
+    url = db.Column('url',db.String(120))
+    
+    def __init__(self, congress_id,url):
         self.congress_id = congress_id
-
+        self.url = url
+        
 class Session(db.Model):
     __tablename__ = 'session'
     session_id = db.Column('session_id',db.Integer, primary_key=True)
@@ -25,10 +27,11 @@ class Session(db.Model):
     category = db.Column('category', db.String(240))
     requires = db.Column('requires', db.String(10))
     passed = db.Column('passed', db.Integer)
-
+    url = db.Column('url',db.String(120))
+    
     def __init__(self, congress_id, year, number, chamber,
                  date, bill_id, question, subject,
-                 category, requires, passed):
+                 category, requires, passed, url):
         
         self.congress_id = congress_id
         self.year = year 
@@ -41,6 +44,7 @@ class Session(db.Model):
         self.category = category
         self.requires = requires
         self.passed = passed
+        self.url = url
 
 class Bill(db.Model):
     __tablename__ = 'bill'
@@ -54,11 +58,12 @@ class Bill(db.Model):
     popular_title = db.Column('popular_title',db.String(120))
     top_subject = db.Column('top_subject',db.String(80))
     text = db.Column('text',db.Text)
+    url = db.Column('url',db.String(120))
     active = db.Column('active',db.Boolean)
-
+    
     def __init__(self, bill_id, congress_id, type, number,
                  title, short_title, popular_title,
-                 top_subject, text, active=False):
+                 top_subject, text, url, active=False):
 
         self.bill_id = bill_id
         self.congress_id = congress_id 
@@ -69,6 +74,7 @@ class Bill(db.Model):
         self.popular_title = popular_title
         self.top_subject = top_subject
         self.text = text
+        self.url = url
         self.active = active
 
 class BillSubject(db.Model):
