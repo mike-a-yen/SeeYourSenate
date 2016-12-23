@@ -6,7 +6,6 @@ import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 import urllib.request as request
 import urllib.parse as urlparse
-import requests
 import re
 import json
 import codecs
