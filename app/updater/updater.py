@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 import urllib.request as request
 import urllib.parse as urlparse
+import requests
 import re
 import json
 import codecs
@@ -269,11 +270,20 @@ def populate_db(congress_id,year):
             
         digest_vote_data(data,session)
 
+
+def deactivate_all_bills():
+    bills = db.session.query(Bill).all()
+    for bill in bills:
+        bill.active=False
+    db.session.commit()
+    return True
+        
 def get_active_bill_data():
+    deactivate_all_bills()
     congress_id = get_congress()
     url = get_xml_link(congress_id)
     page = request.urlopen(url)
-
+    
     root = ET.fromstring(page.read())
     assert congress_id == int(root.find('congress').text)
     years = list(map(int,root.find('years').text.split('-')))
