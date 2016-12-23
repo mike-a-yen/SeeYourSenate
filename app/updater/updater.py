@@ -308,4 +308,14 @@ def get_active_bill_data():
     return 'Success!'
 
 if __name__ == '__main__':
-    print('Do Something in updater.py')
+    instructions = """# get all senate sessions, bills, and votes\n
+    congress_range = range(101,115)
+    years = [(1787+2*congress,1788+2*congress) for congress in congress_range]
+    for congress,years in zip(congress_range,years):
+        for year in years:
+            populate_db(congress,year)
+
+    # search for and deposit active legislation in DB
+    get_active_bills()\n
+    """
+    print(instructions)
