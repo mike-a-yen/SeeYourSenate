@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import re
 
+from sklearn.base import BaseEstimator,TransformerMixin
+
 def vote_map(vote, default=0):
     if vote == 'Yea':
         return 1
@@ -13,7 +15,7 @@ def vote_map(vote, default=0):
     else:
         return default
 
-def get_bills(memid):
+def get_bills_by_member_id(memid):
     bills = db.session.query(Bill)\
                       .filter(Session.session_id==MemberSession.session_id)\
                       .filter(MemberSession.member_id==memid)\
@@ -21,11 +23,11 @@ def get_bills(memid):
     return bills
 
 def get_bill_title(memid):
-    bills = get_bills(memid)
+    bills = get_bills_by_member_id(memid)
     return list(map(lambda x: x.title if x.title != None else '', bills))
 
 def get_bill_top_subject(memid):
-    bills = get_bills(memid)
+    bills = get_bills_by_member_id(memid)
     return list(map(lambda x: x.top_subject if x.top_subject != None else '', bills))
 
 def get_bill_subjects(bill_id):
@@ -39,7 +41,6 @@ def get_vote_history(memid):
         return list(map(lambda x: x[0],votes))
 
     
-    
 def member_vote_table(memid):
     query = db.session.query(Bill.bill_id,Bill.title,Bill.top_subject,
                              Bill.text,MemberSession.vote)\
@@ -50,11 +51,11 @@ def member_vote_table(memid):
     df = pd.DataFrame(query,columns=['bill_id','title','subject','text','vote'])
     df['subjects'] = df['bill_id'].apply(get_bill_subjects)
     df['subjects'] = df['subjects'].apply(lambda x: ' '.join(x))
-    df['body'] = df['title'].str.cat(df['subject'],sep=' ',na_rep='')\
-                            .str.cat(df['subjects'],sep=' ',na_rep='')\
-                            .str.cat(df['text'],sep=' ',na_rep='')
-    df['body'] = df['body'].apply(lambda x: re.sub("\d+", "", x))
-    df['result'] = df['vote'].apply(vote_map)
+    df['decision_text'] = df['title'].str.cat(df['subject'],sep=' ',na_rep='')\
+                                    .str.cat(df['subjects'],sep=' ',na_rep='')\
+                                    .str.cat(df['text'],sep=' ',na_rep='')
+    df['decision_text'] = df['decision_text'].apply(lambda x: re.sub("\d+", "", x))
+    df['vote'] = df['vote'].apply(vote_map)
     return df
 
 def member_vote_subject_table(memid):
@@ -65,3 +66,13 @@ def member_vote_subject_table(memid):
     df = pd.DataFrame(query,columns=['subject','vote'])
     df['result'] = df['vote'].apply(vote_map)
     return df
+
+class FeatureSelector(BaseEstimator,TransformerMixin):
+    def __init__(self,key):
+        self.key = key
+
+    def fit(self, x,y=None):
+        return self
+
+    def transform(self,data_dict):
+        return data_dict[self.key]

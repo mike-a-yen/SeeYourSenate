@@ -5,7 +5,7 @@ from app.models import *
 from app.member_utils import (member_vote_table,
                               member_vote_subject_table,
                               get_bill_top_subject,
-                              vote_map)
+                              vote_map,FeatureSelector)
 from app.utils import (get_member)
 
 import os
@@ -18,7 +18,9 @@ from multiprocessing import Pool, cpu_count
 from functools import partial
 
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer,CountVectorizer
+from sklearn.pipeline import Pipeline,FeatureUnion
+
 
 import nltk
 nltk.data.path.append(BASE_DIR+'/nltk_data/')
@@ -30,7 +32,8 @@ stopwords = nltk.corpus.stopwords.words('english')
 stopwords += ['amdt', 'amend', 'amendment',
               'bill', 'motion','title','act','samdt',
               'table','year','cba','pn','con','sec',
-              'fy','use','used','uses']
+              'fy','use','used','uses','federal','government',
+              'america']
 
 
 def tokenize_and_stem(text, stopwords=stopwords):
@@ -38,6 +41,33 @@ def tokenize_and_stem(text, stopwords=stopwords):
     filtered_tokens = [re.sub('[^a-zA-Z]','',w) for w in tokens]
     stems = [stemmer.stem(t) for t in filtered_tokens]
     return stems
+
+title_vec = CountVectorizer(max_features=200,
+                            ngram_range=(1,2),
+                            tokenizer=tokenize_and_stem,
+                            stop_words=stopwords)
+sub_vec = CountVectorizer(max_features=50,
+                          ngram_range=(1,2),
+                          tokenizer=tokenize_and_stem,
+                          stop_words=stopwords)
+text_vec = TfidfVectorizer(max_features=1000,
+                           max_df=0.95,
+                           min_df=0.05,
+                           ngram_range=(1,3),
+                           tokenizer=tokenize_and_stem,
+                           stop_words=stopwords)
+
+title_features = Pipeline([('selector',FeatureSelector('title')),('count',title_vec)])
+subject_features = Pipeline([('selector',FeatureSelector('subject')),('count',sub_vec)])
+text_features = Pipeline([('selector',FeatureSelector('text')),('tfidf',text_vec)])
+
+class DataPipeline(FeatureUnion):
+    def __init__(self,**kwargs):
+        FeatureUnion.__init__(self,
+                              transformer_list=[('title',title_features),
+						('subject',subject_features),
+						('text',text_features)],
+				**kwargs)
 
 def build_model(memid):
     """Build a knn model for each member
