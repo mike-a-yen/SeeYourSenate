@@ -13,14 +13,20 @@ import pandas as pd
 import numpy as np
 import re
 import json
-import pickle
+from datetime import datetime
 from multiprocessing import Pool, cpu_count
 from functools import partial
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer,CountVectorizer
 from sklearn.pipeline import Pipeline,FeatureUnion
+from sklearn.preprocessing import StandardScaler,Normalizer
+from sklearn.externals import joblib
+from sklearn.exceptions import DataConversionWarning
 
+import warnings
+warnings.simplefilter('ignore',category=DataConversionWarning)
+warnings.simplefilter('ignore',category=UserWarning)
 
 import nltk
 nltk.data.path.append(BASE_DIR+'/nltk_data/')
@@ -57,16 +63,22 @@ text_vec = TfidfVectorizer(max_features=1000,
                            tokenizer=tokenize_and_stem,
                            stop_words=stopwords)
 
-title_features = Pipeline([('selector',FeatureSelector('title')),('count',title_vec)])
-subject_features = Pipeline([('selector',FeatureSelector('subject')),('count',sub_vec)])
-text_features = Pipeline([('selector',FeatureSelector('text')),('tfidf',text_vec)])
-
 class DataPipeline(FeatureUnion):
     def __init__(self,**kwargs):
+        self.title_features = Pipeline([('selector',FeatureSelector('title')),
+                                        ('count',title_vec),
+                                        ('scale',Normalizer())])
+        self.subject_features = Pipeline([('selector',FeatureSelector('subject')),
+                                          ('count',sub_vec),
+                                          ('scale',Normalizer())])
+        self.text_features = Pipeline([('selector',FeatureSelector('text')),
+                                       ('tfidf',text_vec),
+                                       ('scale',Normalizer())])
+        
         FeatureUnion.__init__(self,
-                              transformer_list=[('title',title_features),
-						('subject',subject_features),
-						('text',text_features)],
+                              transformer_list=[('title',self.title_features),
+						('subject',self.subject_features),
+						('text',self.text_features)],
 				**kwargs)
 
 def build_model(memid):
@@ -74,18 +86,16 @@ def build_model(memid):
     member is a database Member object
     """
     df = member_vote_table(memid)
-    
-    tfidf = TfidfVectorizer(max_features=1000,
-                            stop_words=stopwords,
-                            use_idf=True,
-                            tokenizer=None,
-                            ngram_range=(1,3))
-
-    tfidf_matrix = tfidf.fit_transform(df['body'])
+    df.dropna(subset=['vote'],inplace=True)
+    df.fillna('',inplace=True)
+    X = df[['title','subject','text']]
+    y = df['vote']
+    pipeline = DataPipeline(n_jobs=1)
+    features = pipeline.fit_transform(X)
     clf =  KNeighborsClassifier(n_neighbors=10,
                                 weights='distance')
-    clf.fit(tfidf_matrix,df['result'].values)
-    return clf, tfidf
+    clf.fit(features,y)
+    return clf, pipeline
 
 
 def build_save_model(member,version):
@@ -94,22 +104,31 @@ def build_save_model(member,version):
     
     if not os.path.exists('data/nn_models/v%s'%version):
         os.mkdir('data/nn_models/v%s'%version)
-    if not os.path.exists('data/vectorizers/v%s'%version):
-        os.mkdir('data/vectorizers/v%s'%version)
-    member.nn_model_path = 'data/nn_models/v%s/%s.pklb'%(version,memid)
-    member.vectorizer_path = 'data/vectorizers/v%s/%s.pklb'%(version,memid)
+    if not os.path.exists('data/pipelines/v%s'%version):
+        os.mkdir('data/pipelines/v%s'%version)
 
-    clf, tfidf = build_model(memid)
+    clf, pipeline = build_model(memid)
     algorithm = re.search('([a-zA-Z0-9]+)',clf.__repr__()).group()
     db_model = PredictionModel(memid,
                                member.nn_model_path,
+                               member.vectorizer_path,
                                algorithm,
-                               version)
+                               version,
+                               datetime.now())
     db.session.add(db_model)
     db.session.commit()
+
+    pipeline_path = os.path.join(BASE_DIR,'data',
+                                 'pipelines','v%s'%version,
+                                 '%s'%memid)
+    model_path = os.path.join(BASE_DIR,'data',
+                                 'nn_models','v%s'%version,
+                                 '%s'%memid)
+    pipeline_file = open(pipeline_path,'wb')
+    model_file = open(model_path,'wb')
     
-    pickle.dump(clf,open(member.nn_model_path,'wb'))
-    pickle.dump(tfidf,open(member.vectorizer_path,'wb'))
+    joblib.dump(pipeline,pipeline_file)
+    joblib.dump(clf,model_file)
     return True
     
 def build_models(version,members=None):
@@ -118,7 +137,7 @@ def build_models(version,members=None):
     """
     if members == None:
         members = db.session.query(Member).all()
-    p = Pool(1)
+    p = Pool(max(1,cpu_count()-2))
 
     partial_save_model = partial(build_save_model, version=version)
     

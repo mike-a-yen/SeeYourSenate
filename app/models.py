@@ -108,19 +108,14 @@ class Member(db.Model):
     display_name = db.Column('display',db.String(80))
     state = db.Column('state',db.String(40))
     party = db.Column('party',db.String(20))
-    nn_model_path = db.Column('nn_model_path',db.String(40))
-    vectorizer_path = db.Column('vectorizer_path',db.String(40))
 
-    def __init__(self, member_id, first, last, display, state, party,
-                 nn_model_path=None, vectorizer_path=None):
+    def __init__(self, member_id, first, last, display, state, party):
         self.member_id = member_id
         self.first_name = first
         self.last_name = last
         self.display_name = display
         self.state = state
         self.party = party
-        self.nn_model_path = nn_model_path
-        self.vectorizer_path = vectorizer_path
 
 class BillPrediction(db.Model):
     __tablename__ = 'billprediction'
@@ -174,14 +169,18 @@ class PredictionModel(db.Model):
     model_id = db.Column('model_id',db.Integer,primary_key=True)
     member_id = db.Column('member_id',db.ForeignKey('member.member_id'))
     model_path = db.Column('model_path',db.String(80))
+    pipeline_path = db.Column('pipeline_path',db.String(80))
     algorithm = db.Column('algorithm',db.String(20))
     version = db.Column('version',db.Integer)
-
-    def __init__(self,member_id,model_path,algorithm,version):
+    date = db.Column('date',db.DateTime)
+    
+    def __init__(self,member_id,model_path,pipeline_path,algorithm,version,date):
         self.member_id = member_id
         self.model_path = model_path
+        self.pipeline_path = pipeline_path
         self.algorithm = algorithm
         self.version = version
+        self.date = date
         
 if __name__ == '__main__':
     print('Creating DB')
