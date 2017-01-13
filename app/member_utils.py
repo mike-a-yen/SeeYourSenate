@@ -42,19 +42,18 @@ def get_vote_history(memid):
 
     
 def member_vote_table(memid):
-    query = db.session.query(Bill.bill_id,Bill.title,Bill.top_subject,
-                             Bill.text,MemberSession.vote)\
-                      .filter(Bill.bill_id==Session.bill_id)\
-                      .filter(Session.session_id==MemberSession.session_id)\
-                      .filter(MemberSession.member_id==memid).all()
+    vote_query = db.session.query(Bill.bill_id,
+                                  Bill.title,
+                                  Bill.top_subject,
+                                  Bill.text,
+                                  Session.date,
+                                  MemberSession.vote)\
+                           .filter(MemberSession.session_id==Session.session_id)\
+                           .filter(Session.bill_id==Bill.bill_id)\
+                           .filter(MemberSession.member_id==memid)
 
-    df = pd.DataFrame(query,columns=['bill_id','title','subject','text','vote'])
-    df['subjects'] = df['bill_id'].apply(get_bill_subjects)
-    df['subjects'] = df['subjects'].apply(lambda x: ' '.join(x))
-    df['decision_text'] = df['title'].str.cat(df['subject'],sep=' ',na_rep='')\
-                                    .str.cat(df['subjects'],sep=' ',na_rep='')\
-                                    .str.cat(df['text'],sep=' ',na_rep='')
-    df['decision_text'] = df['decision_text'].apply(lambda x: re.sub("\d+", "", x))
+    df = pd.DataFrame(vote_query.all())
+    #df['subjects'] = df['bill_id'].apply(get_bill_subjects)
     df['vote'] = df['vote'].apply(vote_map)
     return df
 
@@ -66,13 +65,3 @@ def member_vote_subject_table(memid):
     df = pd.DataFrame(query,columns=['subject','vote'])
     df['result'] = df['vote'].apply(vote_map)
     return df
-
-class FeatureSelector(BaseEstimator,TransformerMixin):
-    def __init__(self,key):
-        self.key = key
-
-    def fit(self, x,y=None):
-        return self
-
-    def transform(self,data_dict):
-        return data_dict[self.key]

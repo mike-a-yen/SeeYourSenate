@@ -6,7 +6,7 @@ class Congress(db.Model):
     congress_id = db.Column('congress_id',db.Integer,primary_key=True)
     url = db.Column('url',db.String(120))
     
-    def __init__(self, congress_id,url):
+    def __init__(self, congress_id, url):
         self.congress_id = congress_id
         self.url = url
         
@@ -26,12 +26,15 @@ class Session(db.Model):
     subject = db.Column('subject', db.String(240))
     category = db.Column('category', db.String(240))
     requires = db.Column('requires', db.String(10))
+    result = db.Column('result',db.String(20))
     passed = db.Column('passed', db.Integer)
     url = db.Column('url',db.String(120))
+
+    printstr = '<Session session_id:{session_id} congress:{congress_id} bill_id:{bill_id}>'
     
     def __init__(self, congress_id, year, number, chamber,
                  date, bill_id, question, subject,
-                 category, requires, passed, url):
+                 category, requires, result, passed, url):
         
         self.congress_id = congress_id
         self.year = year 
@@ -43,8 +46,14 @@ class Session(db.Model):
         self.subject = subject
         self.category = category
         self.requires = requires
+        self.result = result
         self.passed = passed
         self.url = url
+
+    def __repr__(self):
+        return self.printstr.format(**{'session_id':self.session_id,
+                                       'congress_id':self.congress_id,
+                                       'bill_id':self.bill_id})
 
 class Bill(db.Model):
     __tablename__ = 'bill'
@@ -53,10 +62,10 @@ class Bill(db.Model):
     congress_id = db.Column('congress_id',db.ForeignKey('congress.congress_id'))
     type = db.Column('type', db.String(80))
     number = db.Column('number',db.Integer)
-    title = db.Column('title',db.String(240))
-    short_title = db.Column('short_title',db.String(120))
-    popular_title = db.Column('popular_title',db.String(120))
-    top_subject = db.Column('top_subject',db.String(80))
+    title = db.Column('title',db.String(360))
+    short_title = db.Column('short_title',db.String(240))
+    popular_title = db.Column('popular_title',db.String(240))
+    top_subject = db.Column('top_subject',db.String(120))
     text = db.Column('text',db.Text)
     url = db.Column('url',db.String(120))
     active = db.Column('active',db.Boolean)
@@ -83,9 +92,15 @@ class BillSubject(db.Model):
     bill_id = db.Column('bill_id',db.ForeignKey('bill.bill_id'))
     subject = db.Column('subject',db.String(120))
 
+    printstr = '<BillSubject bill_id:{bill_id} subject:{subject}>'
+    
     def __init__(self, bill_id, subject):
         self.bill_id = bill_id
         self.subject = subject
+
+    def __repr__(self):
+        return self.printstr.format(**{'bill_id':self.bill_id,
+                                       'subject':self.subject})
 
 class MemberSession(db.Model):
     __tablename__ = 'membersession'
@@ -94,12 +109,19 @@ class MemberSession(db.Model):
     member_id = db.Column('member_id', db.ForeignKey('member.member_id'))
     vote = db.Column('vote', db.String(20))
 
+    printstr = '<MemberSession session_id:{session_id} member_id:{member_id} vote:{vote}>'
+    
     def __init__(self, session_id, member_id, vote):
         self.session_id = session_id
         self.member_id = member_id
         self.vote = vote
 
-        
+
+    def __repr__(self):
+        return self.printstr.format(**{'session_id':self.session_id,
+                                       'member_id':self.member_id,
+                                       'vote':self.vote})
+    
 class Member(db.Model):
     __tablename__ = 'member'
     member_id = db.Column('member_id',db.String(20), primary_key=True)
@@ -109,6 +131,8 @@ class Member(db.Model):
     state = db.Column('state',db.String(40))
     party = db.Column('party',db.String(20))
 
+    printstr = '<Member member_id:{member_id} display_name:{display_name}>'
+    
     def __init__(self, member_id, first, last, display, state, party):
         self.member_id = member_id
         self.first_name = first
@@ -117,6 +141,11 @@ class Member(db.Model):
         self.state = state
         self.party = party
 
+    def __repr__(self):
+        return self.printstr.format(**{'member_id':self.member_id,
+                                       'display_name':self.display_name})
+
+    
 class BillPrediction(db.Model):
     __tablename__ = 'billprediction'
     id = db.Column('id',db.Integer,primary_key=True)
@@ -133,6 +162,7 @@ class BillPrediction(db.Model):
         self.passed = passed
         self.model_id = model_id
 
+        
 class VotePrecition(db.Model):
     __tablename__ = 'voteprediction'
     id = db.Column('id',db.Integer,primary_key=True)
@@ -146,6 +176,7 @@ class VotePrecition(db.Model):
         self.member_id = member_id
         self.predicted_vote = predicted_vote
         self.model_id = model_id
+
         
 class BillOutcome(db.Model):
     __tablename__ = 'billoutcome'
@@ -173,6 +204,8 @@ class PredictionModel(db.Model):
     algorithm = db.Column('algorithm',db.String(20))
     version = db.Column('version',db.Integer)
     date = db.Column('date',db.DateTime)
+
+    printstr = '<PredictionModel model_id:{model_id} member_id:{member_id} version:{version}>'
     
     def __init__(self,member_id,model_path,pipeline_path,algorithm,version,date):
         self.member_id = member_id
@@ -181,7 +214,13 @@ class PredictionModel(db.Model):
         self.algorithm = algorithm
         self.version = version
         self.date = date
-        
+
+
+    def __repr__(self):
+        return self.printstr.format(**{'model_id':self.model_id,
+                                       'member_id':self.member_id,
+                                       'version':self.version})
+
 if __name__ == '__main__':
     print('Creating DB')
     db.create_all()

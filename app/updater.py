@@ -79,7 +79,7 @@ def get_active_legislation(xml_page):
 def parse_active(active):
     """Returns short bill name and bill_id"""
     bills = []
-    items = active.findall('item')
+    items = active.findall('.//item')
     for item in items:
         name = item.find('name').text
         for child in item.getchildren():
@@ -136,6 +136,61 @@ def get_session_urls(congress_id,year):
             for code,link in new_sessions]
     return urls
 
+def get_hrefs(page):
+    soup = BeautifulSoup(page.read())
+    hrefs = soup.find_all('a')
+    return hrefs
+
+def save_bill_directory(congress_id):
+    save_dir = os.path.join(BASE_DIR,'data','bills',
+                            congress_id)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    return save_dir
+
+def download_json_from_url(url):
+    """Recursively download data.json files starting from url"""
+    if url.endswith('data.json'):
+        query = db.session.query(Bill).filter_by(url=url).all()
+        if query != None:
+            return None
+        print(url)
+        data = url_to_json(url)
+        if not data:
+            return None
+        congress_id = re.search('[0-9]{3}',url).group()
+        doc_id = data.get('bill_id',data.get('amendment_id'))
+        save_dir = save_bill_directory(congress_id)
+        filename = os.path.join(save_dir,doc_id+'.json')
+        print('Downloading',url,'to',filename)
+        json.dump(data,open(filename,'w'))
+        return None
+    elif url.endswith(('.xml','.txt')):
+        return None
+    else:
+        try:
+            page = request.urlopen(url)
+        except:
+            print('***ERROR***',url)
+            revisit = os.path.join(BASE_DIR,'data','revisit.txt')
+            fo = open(revisit,'a')
+            fo.write('%s\n'%url)
+            fo.close()
+            return None
+        soup = BeautifulSoup(page.read(),'html.parser')
+        links = [link for link in soup.find_all('a') \
+                 if link.text not in ['../','text-versions/']]
+        for link in links:
+            visit_url = os.path.join(url,link.get('href'))
+            download_json_from_url(visit_url)
+    
+def get_bill_urls(congress_id):
+    bill_url = os.path.join(session_base_url,str(congress_id),'bills')
+    amendment_url = os.path.join(session_base_url,str(congress_id),'amendments')
+    for base_url in [bill_url,amendment_url]:
+        base_page = request.urlopen(base_url)
+        
+
 def filter_urls(urls):
     go_to_urls = []
     bill_ids = [x.split('/')[-2]+'-'+x.split('/')[-5] for x in urls]
@@ -146,8 +201,16 @@ def filter_urls(urls):
     return go_to_urls
 
 def url_to_json(url):
-    datapage = request.urlopen(url)
-    data = json.load(reader(datapage))
+    try:
+        datapage = request.urlopen(url)
+        data = json.load(reader(datapage))
+    except:
+        print('***ERROR***',url)
+        revisit = os.path.join(BASE_DIR,'data','revisit.txt')
+        fo = open(revisit,'a')
+        fo.write('%s\n'%url)
+        fo.close()
+        return 0 
     return data
 
 def visit_new_sessions(congress_id,year):
@@ -162,7 +225,7 @@ def digest_congress_data(conid):
         print('New Congress',conid,type(conid))
         congress = Congress(conid,get_congress_url(conid))
         db.session.add(congress)
-        db.session.commit()
+    db.session.commit()
     return congress
 
 def digest_session_data(session_url):
@@ -191,10 +254,10 @@ def digest_session_data(session_url):
                           bill_id, question, subject, category,
                           requires, passed, url)
         db.session.add(session)
-        db.session.commit()
+    db.session.commit()
     return session
 
-def digest_vote_data(session_data,session):
+def digest_vote_data(session_data,session_id):
     for vote,people in session_data['votes'].items():
         for person in people:
             if person == 'VP': continue
@@ -211,15 +274,13 @@ def digest_vote_data(session_data,session):
                 db.session.add(member)
                 db.session.commit()
                     
-            memsess = MemberSession(session.session_id, memid, vote)
+            memsess = MemberSession(session_id, memid, vote)
             db.session.add(memsess)
             db.session.commit()
     return True
 
 def digest_bill_data(bill_id,bill_data):
-    
     bill_congress = bill_data.get('congress')
-
     bill_type = get_bill_type(bill_id)
     if bill_type == 'sa':
         bill_type = 'samdt'
@@ -234,7 +295,6 @@ def digest_bill_data(bill_id,bill_data):
     if summary == None:
         summary = {'text':None}
     bill_text = summary['text']
-
     
     bill = Bill(bill_id, bill_congress,
                 bill_type, bill_number,
@@ -250,9 +310,23 @@ def digest_bill_data(bill_id,bill_data):
         for sub in bill_subjects:
             db_subject = BillSubject(bill.bill_id, sub)
             db.session.add(db_subject)
-        db.session.commit()
-    
+            db.session.commit()
+    db.session.commit()
     return bill
+
+def download_session_data(congress_id,year):
+    download_dir = os.path.join(BASE_DIR,'data','sessions',str(congress_id),str(year))
+    if not os.path.exists(download_dir):
+        os.makedirs(download_dir)
+        print(download_dir,'created')
+    for session_url in get_session_urls(congress_id,year):
+        data = url_to_json(session_url)
+        vote_id = data.get('vote_id')
+        json.dump(data,open(os.path.join(download_dir,vote_id),'w'))
+
+def download_bill_data(congress_id,year):
+    pass
+        
 
 def populate_db(congress_id,year):
     for session_url in get_session_urls(congress_id,year):
@@ -262,13 +336,10 @@ def populate_db(congress_id,year):
         bill = data.get('bill')
         if bill:
             bill_id_short = session.bill_id.split('-')[0]
-            print(bill_id_short)
             bill_data = get_bill_json_from_bill_id(bill_id_short,
                                                    congress.congress_id)
             db_bill = digest_bill_data(session.bill_id,bill_data)
-            
-        digest_vote_data(data,session)
-
+        digest_vote_data(data,session.session_id)
 
 def deactivate_all_bills():
     bills = db.session.query(Bill).all()

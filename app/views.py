@@ -28,6 +28,7 @@ def index():
                                  cluster_plot=cluster_plot,
                                  stats_plot=stats_plot)
 
+
 @app.route('/senator',methods=['GET','POST'])
 def senator():
     senate_members = get_senate()
@@ -46,7 +47,6 @@ def senator():
     print('member id:',memid)
     clouds = make_word_cloud(member)
 
-    #yay_subjects, nay_subjects = positive_negative_subjects(memid)
     subjects = voting_subject_record(memid)
     return flask.render_template('senator.html',
                                  senators=display_names,
