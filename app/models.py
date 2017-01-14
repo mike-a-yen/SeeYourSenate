@@ -152,16 +152,17 @@ class BillPrediction(db.Model):
     bill_id = db.Column('bill_id',db.ForeignKey('bill.bill_id'))
     votes_for = db.Column('votes_for',db.Integer)
     votes_against = db.Column('votes_against',db.Integer)
-    passed = db.Column('passed',db.Boolean)
+    predicted_pass = db.Column('predicted_pass',db.Boolean)
+    correct = db.Column('correct',db.Boolean)
     model_id = db.Column('model_id',db.ForeignKey('predictionmodel.model_id'))
 
-    def __init__(self,bill_id,votes_for,votes_against,passed,model_id):
+    def __init__(self,bill_id,votes_for,votes_against,predicted_passed,model_id,correct=None):
         self.bill_id = bill_id
         self.votes_for = votes_for
         self.votes_against = votes_against
-        self.passed = passed
+        self.predicted_pass = predicted_pass
         self.model_id = model_id
-
+        self.correct = correct
         
 class VotePrecition(db.Model):
     __tablename__ = 'voteprediction'
@@ -170,13 +171,16 @@ class VotePrecition(db.Model):
     member_id = db.Column('member_id',db.ForeignKey('member.member_id'))
     predicted_vote = db.Column('predicted_vote',db.Integer)
     model_id = db.Column('model_id',db.ForeignKey('predictionmodel.model_id'))
-
-    def __init__(self,bill_id,member_id,predicted_vote,model_id):
+    predicted_date = db.Column('predicted_date',db.DateTime)
+    correct = db.Column('correct',db.Boolean)
+    
+    def __init__(self,bill_id,member_id,predicted_vote,model_id,predicted_date,correct=None):
         self.bill_id = bill_id
         self.member_id = member_id
         self.predicted_vote = predicted_vote
         self.model_id = model_id
-
+        self.predicted_date = predicted_date
+        self.correct = correct
         
 class BillOutcome(db.Model):
     __tablename__ = 'billoutcome'

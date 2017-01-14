@@ -60,8 +60,6 @@ subject_vectorizer = CountVectorizer(max_features=50,
                                      tokenizer=tokenize_and_stem,
                                      stop_words=stopwords)
 text_vectorizer = TfidfVectorizer(max_features=1000,
-                                  max_df=0.95,
-                                  min_df=0.05,
                                   ngram_range=(1,3),
                                   tokenizer=tokenize_and_stem,
                                   stop_words=stopwords)
@@ -99,15 +97,11 @@ class DataPipeline(FeatureUnion):
         self.title_features = Pipeline([('selector',FeatureSelector('title')),
                                         ('tfidf',title_vectorizer),
                                         ('scale',Normalizer())])
-        #self.subject_feature[0][1]s = Pipeline([('selector',FeatureSelector('subjects')),
-        #                                  ('count',sub_vec),
-        #                                  ('scale',Normalizer())])
         self.top_subject_features = Pipeline([('selector',FeatureSelector('top_subject')),
                                               ('encoder',DictEncoder()),
                                                ('vectorizer',DictVectorizer())])
         self.date_features = Pipeline([('selector',FeatureSelector('date')),
                                        ('encoder',DateEncoder())])
-                                      
         self.text_features = Pipeline([('selector',FeatureSelector('text')),
                                        ('tfidf',text_vectorizer),
                                        ('scale',Normalizer())])
@@ -129,16 +123,25 @@ def build_model(memid):
     y = df['vote']
     X = df.drop(['vote'],axis=1)
 
-    clf =  KNeighborsClassifier(n_neighbors=100,
-                                weights='distance',
-                                p=1)
-    model = Pipeline([('transform',DataPipeline()),
-                     ('model',clf)])
-    model.fit(X,y)
+    model = train_model(X,y)
     data_transformer = model.steps[0][1]
     return model, data_transformer
 
 
+def train_model(X,y):
+    if len(X) < 200:
+        clf = KNeighborsClassifier(n_neighbors=100,
+                                   weights='distance',
+                                   p=1)
+    else:
+        clf =  KNeighborsClassifier(n_neighbors=100,
+                                    weights='distance',
+                                    p=1)
+    model = Pipeline([('transform',DataPipeline()),
+                     ('model',clf)])
+    model.fit(X,y)
+    return model
+    
 def build_save_model(member,version):
     memid = member.member_id
     print(member.first_name,member.last_name,member.member_id)

@@ -22,9 +22,17 @@ import mpld3
 @app.route('/')
 @app.route('/index')
 def index():
+    return flask.render_template('index.html')
+
+@app.route('/details')
+def details():
+    return flask.render_template('details.html')
+
+@app.route('/preliminary')
+def preliminary():
     cluster_plot = open(BASE_DIR+'/app/static/img/cluster.html','r').read()
     stats_plot = open(BASE_DIR+'/app/static/img/model_performance.html','r').read()
-    return flask.render_template('index.html',
+    return flask.render_template('preliminary.html',
                                  cluster_plot=cluster_plot,
                                  stats_plot=stats_plot)
 
@@ -80,17 +88,21 @@ def bill():
               .filter(Session.bill_id==id)\
               .order_by(Session.number.desc())\
               .order_by(Session.date.desc()).first()
+
+    if session:
     
-    votes = db.session.query(Member.first_name,Member.last_name,Member.state,Member.party,
-                             MemberSession.vote)\
-                             .filter(Member.member_id==MemberSession.member_id)\
-                             .filter(MemberSession.session_id==session.session_id)\
-                             .filter(Session.number==session.number)\
-                             .filter(Session.bill_id==id)\
-                             .order_by(Member.state.asc(),
-                                       Member.party.asc(),
-                                       Member.last_name.asc()).all()
-    
+        votes = db.session.query(Member.first_name,Member.last_name,Member.state,Member.party,
+                                 MemberSession.vote)\
+                          .filter(Member.member_id==MemberSession.member_id)\
+                          .filter(MemberSession.session_id==session.session_id)\
+                          .filter(Session.number==session.number)\
+                          .filter(Session.bill_id==id)\
+                          .order_by(Member.state.asc(),
+                                    Member.party.asc(),
+                                    Member.last_name.asc()).all()
+    else:
+        flask.flash('Something went wrong, bill data can not be retreved.')
+        return flask.redirect(flask.url_for('active'))
     vote_record = pd.DataFrame(votes,columns=['first_name','last_name','state','party','vote'])
     vote_record['vote'] = vote_record['vote'].apply(vote_map)
     vote_record = vote_record.T.to_dict().values()
