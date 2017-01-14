@@ -151,14 +151,15 @@ def download_from_active_page(congress_id):
     date_updated = root.find('date').text
 
     bills = get_active_senate_bills(root)
+    filenames = []
     for name,bill_id in bills:
         url = get_bill_url_from_bill_id(bill_id,congress_id)
         data = url_to_json(url)
         filename = save_json_filename(url,data)
         json_to_save = add_to_json(data,**{'url':url,'active':True})
-        print(filename)
         save_json(json_to_save,filename)
-    return
+        filenames.append(filename)
+    return filenames
 
 
 def get_active_senate_bills(xml_root):
