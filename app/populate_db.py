@@ -122,16 +122,16 @@ def populate_bill(bill_data):
         print('Have it')
         return bill
     
-    #db.session.add(bill)
+    db.session.add(bill)
     logging.info('Bill added: '.join(bill.__repr__()))
-    #db.session.commit()
+    db.session.commit()
     logging.info('Bill populated: '.join(bill.__repr__()))
     
     for sub in subjects:
         billsubject = BillSubject(bill.bill_id, sub)
-        #db.session.add(billsubject)
+        db.session.add(billsubject)
         logging.info('BillSubject added: '.join(billsubject.__repr__()))
-        #db.session.commit()
+        db.session.commit()
         logging.info('BillSubject populated: '.join(billsubject.__repr__()))
     return bill
     

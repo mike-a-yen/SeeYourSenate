@@ -14,7 +14,7 @@ app.logger.addHandler(log_handler)
 
 #local_db = BASE_DIR+'/tmp/congress.db'
 local_db = BASE_DIR+'/tmp/tester.db'
-aws_db = 'mysql+pymysql://senator:91f7eacdc792@seeyoursenaterds.clnuzgmorptt.us-west-2.rds.amazonaws.com:3306/seeyoursenatedb'
+aws_db = 'mysql+pymysql://senator:91f7eacdc792@seeyoursenatedb.clnuzgmorptt.us-west-2.rds.amazonaws.com:3306/seeyoursenatedb'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////'+local_db
 #app.config['SQLALCHEMY_DATABASE_URI'] = aws_db
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True

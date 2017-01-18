@@ -19,10 +19,11 @@ from functools import partial
 
 from sklearn import base
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline,FeatureUnion
-from sklearn.preprocessing import StandardScaler, Normalizer, LabelBinarizer
+from sklearn.preprocessing import StandardScaler, Normalizer, LabelBinarizer, OneHotEncoder
 from sklearn.externals import joblib
 from sklearn.exceptions import DataConversionWarning
 
@@ -53,14 +54,15 @@ def tokenize_and_stem(text, stopwords=stopwords):
 
 title_vectorizer = TfidfVectorizer(max_features=200,
                                    ngram_range=(1,2),
+                                   max_df = 0.95,
+                                   min_df = 0.01,
                                    tokenizer=tokenize_and_stem,
                                    stop_words=stopwords)
-subject_vectorizer = CountVectorizer(max_features=50,
-                                     ngram_range=(1,2),
-                                     tokenizer=tokenize_and_stem,
-                                     stop_words=stopwords)
+
 text_vectorizer = TfidfVectorizer(max_features=1000,
                                   ngram_range=(1,3),
+                                  max_df = 0.95,
+                                  min_df = 0.01,
                                   tokenizer=tokenize_and_stem,
                                   stop_words=stopwords)
 
@@ -72,16 +74,14 @@ class FeatureSelector(base.BaseEstimator,base.TransformerMixin):
         return self
 
     def transform(self,data_dict,y=None):
-        null = np.ones((len(data_dict),1))
-        null[:] = np.nan
-        return data_dict.get(self.key,null)
+        return data_dict[self.key]
 
-class DictEncoder(base.BaseEstimator,base.TransformerMixin):
+class SubjectEncoder(base.BaseEstimator,base.TransformerMixin):
     def fit(self,X,y=None):
         return self
 
     def transform(self,X):
-        return [{k:1 for k in row} for row in X]
+        return [{subject:1} for subject in X]
 
 
 class DateEncoder(base.BaseEstimator,base.TransformerMixin):
@@ -98,8 +98,7 @@ class DataPipeline(FeatureUnion):
                                         ('tfidf',title_vectorizer),
                                         ('scale',Normalizer())])
         self.top_subject_features = Pipeline([('selector',FeatureSelector('top_subject')),
-                                              ('encoder',DictEncoder()),
-                                               ('vectorizer',DictVectorizer())])
+                                              ('encoder',LabelBinarizer(sparse_output=True))])
         self.date_features = Pipeline([('selector',FeatureSelector('date')),
                                        ('encoder',DateEncoder())])
         self.text_features = Pipeline([('selector',FeatureSelector('text')),
@@ -109,9 +108,41 @@ class DataPipeline(FeatureUnion):
         FeatureUnion.__init__(self,
                               transformer_list=[('title',self.title_features),
                                                 ('top_subject',self.top_subject_features),
-						('text',self.text_features),
-                                                ('date',self.date_features)],
+                                                ('date',self.date_features),
+						('text',self.text_features)],
 				**kwargs)
+
+def accuracy(actual,prediction):
+    return np.mean(actual==prediction)
+
+
+def mean_binary_accuracy(estimator,X,y):
+    predictions = estimator.predict(X)
+    return accuracy(y,predictions)
+
+
+def train_model(X,y):
+    data_pipeline = DataPipeline()
+    X = data_pipeline.fit_transform(X)
+
+    clf = KNeighborsClassifier()
+    k_range = {'n_neighbors':[1,5,10,50,100]}
+    weights =  {'weights':['uniform','distance'],
+                'p':[1,2]}
+    
+    for param in [k_range,weights]:
+        search = GridSearchCV(clf,
+                              param_grid=param,
+                              scoring=mean_binary_accuracy)
+        search.fit(X,y)
+        clf = search.best_estimator_
+        print(param.keys(),search.best_params_,search.best_score_)
+
+    model = Pipeline([('transform',data_pipeline),
+                     ('model',clf)])
+    best_accuracy = search.best_score_
+    return model, best_accuracy
+
 
 def build_model(memid):
     """Build a knn model for each member
@@ -123,25 +154,32 @@ def build_model(memid):
     y = df['vote']
     X = df.drop(['vote'],axis=1)
 
-    model = train_model(X,y)
-    data_transformer = model.steps[0][1]
-    return model, data_transformer
-
-
-def train_model(X,y):
-    if len(X) < 200:
-        clf = KNeighborsClassifier(n_neighbors=100,
-                                   weights='distance',
-                                   p=1)
+    if len(X) < 10: # new member
+        model = None
+        data_transformer = None
+        accuracy = np.nan
     else:
-        clf =  KNeighborsClassifier(n_neighbors=100,
-                                    weights='distance',
-                                    p=1)
-    model = Pipeline([('transform',DataPipeline()),
-                     ('model',clf)])
-    model.fit(X,y)
-    return model
+        model,accuracy = train_model(X,y)
+        data_transformer = model.steps[0][1]
+    return model, accuracy, data_transformer
+
+
+def populate_model(proposed_db_model):
+    memid = proposed_db_model.member_id
+    version = proposed_db_model.version
+    query = db.session.query(PredictionModel)\
+                      .filter_by(member_id=proposed_db_model.member_id)\
+                      .filter_by(version=version).first()
+    if query:
+        query.algorithm = proposed_db_model.algorithm
+        query.accuracy = proposed_db_model.accuracy
+        query.date = datetime.now()
+        db.session.commit()
+    else:
+        db.session.add(proposed_db_model)
+        db.session.commit()
     
+
 def build_save_model(member,version):
     memid = member.member_id
     print(member.first_name,member.last_name,member.member_id)
@@ -156,17 +194,19 @@ def build_save_model(member,version):
     model_path = os.path.join(BASE_DIR,'data',
                               'nn_models','v%s'%version,
                               '%s.pklb'%memid)
-    
-    model, transformer = build_model(memid)
+
+    print(member.display_name,member.member_id)
+    model, accuracy, transformer = build_model(memid)
+    print(member.display_name,member.member_id,accuracy)
     algorithm = re.search('([a-zA-Z0-9]+)',model.steps[1][1].__repr__()).group()
     db_model = PredictionModel(memid,
                                model_path,
                                pipeline_path,
                                algorithm,
                                version,
+                               accuracy,
                                datetime.now())
-    db.session.add(db_model)
-    db.session.commit()
+    populate_model(db_model)
     pipeline_file = open(pipeline_path,'wb')
     model_file = open(model_path,'wb')
     joblib.dump(transformer,pipeline_file)

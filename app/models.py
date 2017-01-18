@@ -207,16 +207,18 @@ class PredictionModel(db.Model):
     pipeline_path = db.Column('pipeline_path',db.String(80))
     algorithm = db.Column('algorithm',db.String(20))
     version = db.Column('version',db.Integer)
+    accuracy = db.Column('accuracy',db.Float)
     date = db.Column('date',db.DateTime)
 
     printstr = '<PredictionModel model_id:{model_id} member_id:{member_id} version:{version}>'
     
-    def __init__(self,member_id,model_path,pipeline_path,algorithm,version,date):
+    def __init__(self,member_id,model_path,pipeline_path,algorithm,version,accuracy,date):
         self.member_id = member_id
         self.model_path = model_path
         self.pipeline_path = pipeline_path
         self.algorithm = algorithm
         self.version = version
+        self.accuracy = accuracy
         self.date = date
 
 

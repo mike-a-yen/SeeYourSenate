@@ -111,3 +111,9 @@ def bill():
                                  display_title=bill_id,
                                  bill=bill,
                                  votes=vote_record)
+
+@app.route('/groups')
+def groups():
+    graph_plot = open(os.path.join(BASE_DIR,'app/static/img/party_graph.html')).read()
+    return flask.render_template('groups.html',
+                                 graph=graph_plot)
