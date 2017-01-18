@@ -22,19 +22,23 @@
 	    <th>Main Subject
 	    <th>Predicted Votes (Yay/Nay)
 	    <th>Passed
-	      {%- for row in active_bills %}
-	      <tr class={{ "success" if row.done }}>
-		<td>{{ row.bill_id }}
-		<td>{{ row.top_subject }}</td>
-		<td>{{ row.votes_for }}/{{ row.votes_against }}</td>
-		{% if row.passed %}
-		<td><img src="/static/img/checkmark.png"
-			 width="16px"></td>
-		{% else %}
-		<td><img src="/static/img/xmark.png"
-			 width="16px"></td>
-		{% endif %}
-		{%- endfor %}
+	  </tr>
+	  {%- for row in active_bills %}
+	  <tr onclick="document.location='/bill?bill_id={{row.bill_id}}'"
+	      style="cursor: pointer">
+	    <td>{{ row.bill_id }}</td>
+	    <td>{{ row.top_subject }}</td>
+	    <td>{{ row.votes_for }}/{{ row.votes_against }}</td>
+	    {% if row.passed %}
+	    <td><img src="/static/img/checkmark.png"
+		     width="16px"></td>
+	    {% else %}
+	    <td><img src="/static/img/xmark.png"
+		     width="16px"></td>
+	    {% endif %}
+	  </tr>
+	  </a>
+	  {%- endfor %}
 	</table>
       </div>
     </div>

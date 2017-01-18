@@ -14,8 +14,7 @@
 
 <script src="/static/js/jquery.js"></script>
 <script src="/static/js/bootstrap.js"></script>
-
-
+<script src="/static/js/bokeh-0.12.2.min.js"></script>
 <nav class="navbar navbar-fixed-top navbar-inverse">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -38,6 +37,7 @@
 	<li><a href="/" style="font-size: 16px">Home<span class="sr-only">(current)</span></a></li>
 	<li><a href="/senator" style="font-size: 16px">Senators</a></li>
 	<li><a href="/active" style="font-size: 16px">Active Bills</a></li>
+	<li><a href="/groups" style="font-size: 16px">Future Work</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
 	
@@ -55,18 +55,46 @@
 </div>
 
 <div id="main" class="container">
-    {% block body %}{% endblock %}
+  {% block body %}
+  {% endblock %}
   <hr>
-  <footer id="footer">
-    built by Michael Yen - Data Incubator Fellow
-    <br>
-    <br>
-    <a target="_blank" href="https://www.linkedin.com/pub/michael-yen/10a/553/674">
-      <img src="https://static.licdn.com/scds/common/u/img/webpromo/btn_viewmy_160x33.png"
-           width="160" height="33"
-	   border="0"
-	   alt="View Michael Yen's profile on LinkedIn">
-    </a>
 
-  </footer>
+  <div class="col-xs-12" style="background-color:rgba(255,255,255,0.75);border-radius:10px;padding:20px;">
+    <footer id="footer">
+      <div class="row">
+	<div class="col-xs-4">
+	  <p>built by</p>
+	  <p style="font-size:16px;">
+	    Michael Yen - Data Incubator Fellow</p>
+	  <br>
+	  <a target="_blank" href="https://www.linkedin.com/pub/michael-yen/10a/553/674">
+	    <img src="https://static.licdn.com/scds/common/u/img/webpromo/btn_viewmy_160x33.png"
+		 width="160" height="33"
+		 border="0"
+		 alt="View Michael Yen's profile on LinkedIn">
+	  </a>
+	  
+	</div>
+
+	<div class="col-xs-4 text-center">
+	  <br>
+	  <br>
+	  <br>
+	  <br>
+	  <p class="text-center">
+	    <a href="/details">Technical Details</a>
+	    <br>
+	    <a href="/preliminary">Preliminary Analysis</a></p>
+	</div>
+	
+	<div class="col-xs-4 text-right">
+	  <p class="text-right">Data provided by
+	    <a href="https://www.govtrack.us/developers/data">govtrack</a>.</p>
+	  <p class="text-right">Congressional voting data is downloadable
+	    <a href="https://www.govtrack.us/data/congress/">here</a>.</p>
+	  <br>
+	</div>
+      </div>
+    </footer>
   </div>
+</div>

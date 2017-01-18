@@ -1,108 +1,97 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="jumbotron">
+
+<body style="background-image:url('/static/img/capitol_building_small.jpg');">
+  <div class="jumbotron" style="background: rgba(255, 255, 255, 0.6);">
+    <div class="container-fluid">
+      <div class="row">
+	<div class="col-xs-12">
+	  <h2>Congressional Bill Predictions</h2>
+	  <br>
+	  <h4 style="display:inline;color:rgb(0,0,0)"><q>Whenever people are well-informed they can be trusted with
+	      their own government.</q></h3>
+	  <h4>-Thomas Jefferson</h4>
+	</div>
+      </div>
+    </div>
+  </div>
+
   <div class="container-fluid">
     <div class="row">
-      <h2>Welcome to See Your Senate</h2>
       <div class="col-xs-12">
-	Data provided by
-	<a href="https://www.govtrack.us/developers/data">govtrack</a>.
-	<br>
-	Congressional voting data is downloadable
-	<a href="https://www.govtrack.us/data/congress/">here</a>.
-	<br>
-	<br>
+	<div class="col-xs-4">
+	  <a href="/senator">
+	  <div class="thumbnail"
+	       style="background: rgba(255, 255, 255,
+		      0.6);border:0px none;
+		      min-height:300px;
+		      min-width:300px">
+	    <h3 style="color:rgb(0,0,0);">Senator View</h3>
+	    <div class="caption">
+	       <p>Quickly understand the voting history of each
+	      U.S. senator. You will get a high level summary of what kinds of
+		 topics and ideas each senator votes for and against.</p>
+	       <p>See which topics your representatives are voting for.</p>
+	    </div>
+	    <p style="text-align:center;">
+	      <button type="button" class="btn btn-primary btn-lg btn-block"
+		      style="verticle-align:bottom;">
+		View Senators</button>
+	    </p>
+	  </div>
+	  </a>
+	</div>
+	
+	<div class="col-xs-4">
+	  <a href="/active">
+	    <div class="thumbnail"
+		 style="background: rgba(255, 255, 255, 0.6);
+			border:0px none;
+			min-height:300px;
+			min-width:300px">
+	      <h3 style="color:rgb(0,0,0);">Active Bills</h3>
+	      <div class="caption">
+		<p>We understand the voting patterns of each U.S. senator and
+		  make predictions of their vote on active legislation. Our models
+		  are 70% accurate for each senator and 80% accurate for the entire
+		  Senate.</p>
+		<p>See which bills are likely to become law.</p>
+	      </div>
+	      <p style="text-align:center">
+		<button type="button" class="btn btn-primary btn-lg btn-block"
+			style="verticle-align:bottom;">
+		  View Active Bills</button>
+	      </p>
+	    </div>
+	  </a>
+	</div>
+	
+	
+	<div class="col-xs-4">
+	  <a href="/groups">
+	    <div class="thumbnail"
+		 style="background: rgba(255, 255, 255, 0.6);
+			border:0px none;
+			min-height:300px;
+			min-width:300px">
+	      <h3 style="color:rgb(0,0,0);">Future Work</h3>
+	      <div class="caption">
+		<p>Senators do not always cast their vote in isolation, their votes can
+		  be influenced by their colleagues. Finding the most influential
+		  groups of senators will help illuminate some of the internal
+		  politics that occurs outside of the public eye.</p>
+		<p>Find the most powerful group of senators.</p>
+	      </div>
+	      <p style="text-align:center">
+		<button type="button" class="btn btn-primary btn-lg btn-block"
+			style="verticle-align:bottom;">
+		  Future Work</button>
+	      </p>
+	    </div>
+	  </a>
+	</div>
       </div>
     </div>
   </div>
-</div>
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-xs-12">
-      <h4>About</h4>
-      <p>SYS has built a model that predicts the probability of a bill
-	passing through the United States senate. We model the voting behavior of each
-	senator from the text contained inside the bill, and with this
-	information determine the probability of the bill being passed into
-	law. Preliminary evidence has shown that SYS can predict the
-	outcome of each bill with 80% accuracy. That is 8 out of 10 times SYS
-	correctly determines if the bill passes or fails.</p>
-      <p>In addition to this, we also summarize the voting
-	behavior of individual senators, so you can get an idea
-	about what your representative is voting for. This information
-	can be used to see if your representative is likely to vote
-	for bills you care about. Check out the
-	<a href="/senator">Senator</a>
-	page for more details.</p>
-      
-      <h4>Preliminary Analysis</h4>
-      <p>The following analysis was done by studying the voting habits of
-	  Senator Barbara Boxer (CA-D) over the last 16 years. In total, she
-	participated in over 5,000 votes, with an approximately 50-50 split between
-	"Yay" and "Nay" votes. By vectorizing the text in the headers of each
-	bill, I was able to build a model that predicted Boxer's voting behavior
-	with 70% accuracy, which is an improvement over random guessing.
-	If I build a similar model for all other senators, retaining the 70%
-	accuracy, I will be able to correctly predict wether or not a bill will
-	pass the senate with an accuracy of 80%. 
-      </p>
-    </div>
-  </div>
-</div>
-
-
-<div class="container">
-  <div class="row">
-    <div class="col-xs-6">
-      <div class="header">
-	<h4>Congressional Bill Clusters</h4>
-      </div>
-      <div class="center-block">
-	{{ cluster_plot|safe }}
-      </div>
-      <p><small>Try the pan and zoom tools</small></p>
-      <p>Bills are clustered together by use of similar vocabulary.
-	Bills that mention similar things are grouped together. For
-	example, bills that
-	mention education are in a different group than bills that mention
-	terrorism. The body of text used to identify each bill was taken from
-	the each bill's title. This could be improved if the body of each bill
-	was used rather than just the title.
-	<br>
-	Large dots are "Yay" votes and smaller dots are "Nay" votes,
-	and from this visualization you can see Boxer has a tendency to vote
-	"Yay" for all bills in some clusters and "Nay" for bills in other
-	clusters.</p>
-      <p>
-	The fact that Boxer has a pattern of voting for or against bills with
-	certain content, allows for a model to be built to predict her voting behavior.
-	</p>
-    </div>
-    
-    <div class="col-xs-6">
-      <div class="header">
-	<h4>Correct Prediction Probability</h4>
-      </div>
-      {{ stats_plot|safe }}
-      <!--      <img src="/static/img/model_performance.png"
-	   width="480"
-	   height="400">
--->
-      <p><small>This model will correctly predict the
-      "pass" or "no pass" outcome with 80% accuracy.</small></p>
-      <p>The voting behavior of the senate as a whole can be predicted by the
-	voting behavior of individual senators. This representation can be
-	more accurate than random if the individual predictive models for each
-	senator are more accurate than 50%. This increased accuracy allows better predictions to be made on
-	the outcomes of individual bills. 
-	Building 100 individual
-	models that can predict the voting behavior of each
-	senator with an accuracy of 70% or greater, will correctly determine
-	whether or not the bill passes with an accuracy of at least 80%. 
-      </p>
-      <p> This means when fully built, this model will correctly predict the
-      "pass" or "no pass" outcome of future laws with an accuracy of 80%.
-    </div>
-  </div>
-</div>
+</body>
 {% endblock %}

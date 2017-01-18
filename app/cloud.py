@@ -1,5 +1,6 @@
 from app import BASE_DIR
 from app.member_topics import vote_topic_freq
+from app.build_models import stopwords
 
 import os
 import numpy as np
@@ -80,7 +81,7 @@ def generate_word_cloud(words, type='Yea'):
     wc = WordCloud(background_color='white',
                    max_words=100,
                    mask=mask,
-                   stopwords=STOPWORDS)
+                   stopwords=stopwords)
     #wc = wc.generate_from_frequencies(word_freq)
     wc = wc.generate(words)
     wc = wc.recolor(color_func=color_func)

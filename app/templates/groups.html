@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>Influential Groups</h4>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="header">
+	<h4>Senators by Similar Votes</h4>
+      </div>
+      <p>Future work is to examine the most influential groups of senators by
+	similar voting patterns. Shown here are the senators grouped by similar
+	voting patterns, and colored by political party.
+      </p>
+      <div class="text-center">
+	{{ graph|safe }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

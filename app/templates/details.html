@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="header">
+	<h2>Technical Details</h2>
+      </div>
+      <br>
+      <div class="col-xs-5">
+	<div class="header">
+	  <h4>Description of data</h4>
+	</div>
+	<p>The U.S. Senate votes on several hundred bills each year. All of the
+	  data used by SYS is publicly available and free to download. You can
+	  download the voting record of each congressional session all the way
+	  back to the first congress. Most of the data used by SYS to make
+	  predictions is based off of the title, main subject, and textual
+	  content of each bill. Our database contains the voting record of each
+	  senator going back to the 103rd congress, which served in 1993 and
+	  1994.
+	</p>
+      </div>
+
+      <div class="col-xs-2">
+      </div>
+      
+      <div class="col-xs-5">
+	<div class="header">
+	  <h4>Model Details</h4>
+	</div>
+	<p>What makes SYS's bill predictions accurate is the leverage gained by
+	  modeling each senator individually. By aggregating these individual
+	  models into one super model we are able to boost our prediction
+	  accuracy by almost 10%, making our pass/fail predictions over 80%
+	  accurate. The math behind this boost is the same as ensemble machine
+	  learning methods.</p>
+	<p>Each senator has a predictive model that is based on his or her own
+	  voting record. The predictions made by each model are influenced by
+	  the senator's voting record on bills with similar subject and content.
+      </div>
+      
+      
+    </div>
+  </div>
+</div>
+{% endblock %}

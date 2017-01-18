@@ -5,7 +5,7 @@ analyze/
 app/templates/*.html~
 app/static/word_clouds/*
 app/*.pyc
-tmp/*.BACK
+tmp/*.db
 .DS_Store
 __pycache__/
 app/__pycache__/
