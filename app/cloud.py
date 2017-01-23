@@ -2,6 +2,8 @@ from app import BASE_DIR
 from app.member_topics import vote_topic_freq
 from app.build_models import stopwords
 
+import pdb
+
 import os
 import numpy as np
 import glob

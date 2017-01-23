@@ -61,10 +61,16 @@ def vote_topic_freq(memid):
     df = df[df['vote'].isin(votes)]
     groups = df.groupby(['subject','vote'],as_index=False).sum()
     groups = groups.groupby(['subject'],as_index=False).max()
-    yay = groups[groups['vote']=='Yea']
-    nay = groups[groups['vote']=='Nay']
-    yay_freq = [(row['subject'],row['count_1']) for _,row in yay.iterrows()]
-    nay_freq = [(row['subject'],row['count_1']) for _,row in nay.iterrows()]
+    yay = groups[groups['vote']=='Yea'].sort_values(['count_1'],ascending=False)
+    nay = groups[groups['vote']=='Nay'].sort_values(['count_1'],ascending=False)
+    if len(yay) == 0:
+        yay_freq = [('None',1)]*500
+    else:
+        yay_freq = [(row['subject'],row['count_1']) for _,row in yay.iterrows()]
+    if len(nay) == 0:
+        nay_freq = [('None',1)]*500
+    else:
+        nay_freq = [(row['subject'],row['count_1']) for _,row in nay.iterrows()]
     vote_words = {'Yea':yay_freq,
                   'Nay':nay_freq}
     return vote_words
