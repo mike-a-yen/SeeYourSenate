@@ -9,6 +9,7 @@ from PIL import Image
 from scipy.misc import imread
 
 import matplotlib
+import mpld3
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -32,37 +33,44 @@ def blue_color_func(word, font_size, position, orientation,
     return tuple(Blues_9.colors[np.random.randint(5,9)])
 
 def cloud_to_fig(cloud):
-    fig,ax = plt.subplots()
+    fig,ax = plt.subplots(figsize=(7,7))
     fig.tight_layout()
-    ax.imshow(cloud)
-    ax.axis('off')
+    ax.imshow(cloud,origin='lower')
+    #ax.xaxis.set_visible(False)
+    #ax.yaxis.set_visible(False)
+    ax.set_frame_on(False)
+    ax.xaxis.set_major_formatter(plt.NullFormatter())
+    ax.yaxis.set_major_formatter(plt.NullFormatter())
+    #ax.axis('off')
     return fig
 
-def save_member_cloud(fig,member,key):
-    path = '/static/word_clouds/'+\
-           key+'_'+member.first_name+'_'+\
-           member.last_name+'.png'
-    fig.savefig(BASE_DIR+'/app'+path, bbox_inches='tight')
+def save_member_cloud(html,member,key):
+    file_name = key+'_'+member.first_name+'_'+member.last_name+'.html'
+    path = os.path.join(BASE_DIR,'app/static/word_clouds',
+                        file_name)
+    fo = open(path,'w')
+    fo.write(html)
     return path
 
 def make_word_cloud(member):
     base_path = os.path.join(BASE_DIR,'app','static','word_clouds')
-    cloud_path = os.path.join(base_path,'*%s*%s.png'%(member.first_name,
+    cloud_path = os.path.join(base_path,'*%s*%s.html'%(member.first_name,
                                                       member.last_name))
     if glob.glob(cloud_path):
-        paths = {'Yea':'/static/word_clouds/Yea_%s_%s.png'%(member.first_name,
-                                                            member.last_name),
-                 'Nay':'/static/word_clouds/Nay_%s_%s.png'%(member.first_name,
-                                                            member.last_name)}
+        paths = {'Yea':BASE_DIR+'/app/static/word_clouds/Yea_%s_%s.html'%(member.first_name,
+                                                                          member.last_name),
+                 'Nay':BASE_DIR+'/app/static/word_clouds/Nay_%s_%s.html'%(member.first_name,
+                                                                          member.last_name)}
+        return {key:open(path,'r').read() for key,path in paths.items()}
     else: # make clouds
-        vote_words = vote_topic_freq(member.member_id)
-        clouds = {key:generate_word_cloud(words.lower(),key)\
-                  for key,words in vote_words.items()}
-        paths = {key:save_member_cloud(fig,member,key)\
-                 for key,fig in clouds.items()}
-    return paths
+        topic_freqs = vote_topic_freq(member.member_id)
+        clouds = {key:generate_word_cloud(word_freqs,key)\
+                  for key,word_freqs in topic_freqs.items()}
+        paths = {key:save_member_cloud(html,member,key)\
+                 for key,html in clouds.items()}
+    return clouds
 
-def generate_word_cloud(words, type='Yea'):
+def generate_word_cloud(word_freq, type='Yea'):
     """Make a word cloud from a list of words"""
     if type =='Yea':
         thumb = Image.open(BASE_DIR+'/app/static/img/thumbs-up.png')
@@ -73,17 +81,19 @@ def generate_word_cloud(words, type='Yea'):
     else:
         thumb = Image.open(BASE_DIR+'/app/static/img/thumbs-up.png')
         color_func = green_color_func
-        
+    
     mask = Image.new("RGB", thumb.size, (255,255,255))
     mask.paste(thumb,thumb)
     mask = np.array(mask)
     
     wc = WordCloud(background_color='white',
-                   max_words=100,
+                   width=4000,
+                   height=4000,
+                   max_words=225,
                    mask=mask,
                    stopwords=stopwords)
-    #wc = wc.generate_from_frequencies(word_freq)
-    wc = wc.generate(words)
+    wc = wc.generate_from_frequencies(word_freq)
+    #wc = wc.generate(words)
     wc = wc.recolor(color_func=color_func)
     fig = cloud_to_fig(wc)
-    return fig
+    return mpld3.fig_to_html(fig)

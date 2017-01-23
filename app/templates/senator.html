@@ -56,14 +56,20 @@
       <div class="col-xs-6">
 	<div class="header text-center">
 	</div>
+	{{ yay_cloud | safe }}
+	<!--
 	<img src="{{ yay_cloud }}"
 	     class="img-responsive" alt="Vote 'Yay' Words">
+	-->
       </div>
       <div class="col-xs-6">
 	<div class="header text-center">
 	</div>
+	{{ nay_cloud | safe }}
+	<!--
 	<img src="{{ nay_cloud }}"
 	     class="img-responsive" alt="Vote 'Nay' Words">
+	-->
       </div>
     </div>
   </div>
