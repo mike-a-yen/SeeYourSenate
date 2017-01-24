@@ -66,11 +66,15 @@ def vote_topic_freq(memid):
     if len(yay) == 0:
         yay_freq = [('None',1)]*500
     else:
-        yay_freq = [(row['subject'],row['count_1']) for _,row in yay.iterrows()]
+        yay_freq = [(word,row['count_1'])
+                    for _,row in yay.iterrows()
+                    for word in row['subject'].split()]
     if len(nay) == 0:
         nay_freq = [('None',1)]*500
     else:
-        nay_freq = [(row['subject'],row['count_1']) for _,row in nay.iterrows()]
+        nay_freq = [(word,row['count_1'])
+                    for _,row in nay.iterrows()
+                    for word in row['subject'].split()]
     vote_words = {'Yea':yay_freq,
                   'Nay':nay_freq}
     return vote_words
