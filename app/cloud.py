@@ -108,7 +108,7 @@ def generate_word_cloud(word_freq, type='Yea'):
                    stopwords=stopwords)
     wc = wc.generate_from_frequencies(word_freq)
 
-    word_color_table = word_cloud_color_table(wc,color_map,scale=(3,8))
+    word_color_table = word_cloud_color_table(wc,color_map,scale=(4,8))
     print(word_color_table)
     color_func = partial(scalable_color,word_color_table=word_color_table)    
     #wc = wc.generate(words)
