@@ -1,6 +1,8 @@
 from app import db, BASE_DIR
 from app.models import *
 
+from IPython import embed
+
 import os
 import glob
 import json
@@ -119,20 +121,24 @@ def populate_bill(bill_data):
 
     bill_query = db.session.query(Bill).filter_by(bill_id=bill_id).first()
     if bill_query:
-        print('Have it')
+        print('Updating...')
+        bill_query.title = bill.title
+        bill_query.short_title = bill.short_title
+        bill_query.popular_title = bill.popular_title
+        bill_query.top_subject = bill.top_subject
+        bill_query.text = bill.text
+        bill_query.url = bill.url
+        bill_query.active = bill.active
+        db.session.commit()
         return bill
     
     db.session.add(bill)
-    logging.info('Bill added: '.join(bill.__repr__()))
     db.session.commit()
-    logging.info('Bill populated: '.join(bill.__repr__()))
     
     for sub in subjects:
         billsubject = BillSubject(bill.bill_id, sub)
         db.session.add(billsubject)
-        logging.info('BillSubject added: '.join(billsubject.__repr__()))
         db.session.commit()
-        logging.info('BillSubject populated: '.join(billsubject.__repr__()))
     return bill
     
 def populate_congress(congress_id):
