@@ -1,6 +1,8 @@
 from app import db, BASE_DIR
 from app.models import *
 
+from IPython import embed
+
 import os
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
@@ -154,10 +156,12 @@ def download_from_active_page(congress_id):
     filenames = []
     for name,bill_id in bills:
         url = get_bill_url_from_bill_id(bill_id,congress_id)
+        print(url)
         data = url_to_json(url)
         filename = save_json_filename(url,data)
         json_to_save = add_to_json(data,**{'url':url,'active':True})
         save_json(json_to_save,filename)
+        print('Saved',filename)
         filenames.append(filename)
     return filenames
 
@@ -176,5 +180,7 @@ def get_active_senate_bills(xml_root):
                         noLink = attrib.get('noLink')=='yes'
                         if article.text != None and not noLink:
                             bill_id = article.text.lower().replace('.','')
+                            print(bill_id)
                             bills.append((name,bill_id))
+    print(bills)
     return bills

@@ -23,10 +23,27 @@ def senator_prediction(member,version,bill_data):
     prediction_model = model_query.first()
     if prediction_model:
         model = joblib.load(prediction_model.model_path)
-        return model.predict(bill_data)
+        vote =  model.predict(bill_data)[0]
     else:
-        return np.array([None])
+        vote = None
+    if record:
+        record_prediction(member,bill_data['bill_id'],vote,prediction_model)
+    return vote
 
-def senate_prediction(members,bill_data):
-    predictions = np.vstack((senator_prediction(member,bill_data) for member in members))
+def senate_prediction(members,bill_data,record=False):
+    predictions = np.zeros(len(members))
+    for i,member in enumerate(members):
+        vote = senator_prediction(member,bill_data,record=record)
+        predictions[i] = vote
     return prediction
+
+def record_prediction(member,bill_id,vote,model):
+    vote_prediction = VotePrediction(bill_id,
+                                     member.member_id,
+                                     vote,
+                                     model.model_id,
+                                     datetime.now(),
+                                     correct=None)
+    
+    db.session.add(vote_prediction)
+    db.session.commit()

@@ -15,12 +15,19 @@
 	<p>The U.S. Senate votes on several hundred bills each year. All of the
 	  data used by SYS is publicly available and free to download. You can
 	  download the voting record of each congressional session all the way
-	  back to the first congress. Most of the data used by SYS to make
-	  predictions is based off of the title, main subject, and textual
-	  content of each bill. Our database contains the voting record of each
-	  senator going back to the 103rd congress, which served in 1993 and
-	  1994.
+	  back to the first congress. SYS keeps track of each congressional bill
+	  and each senators' voting record in order to make the most accurate
+	  predictions on which bills will become laws. Our database contains
+	  over 135,000 congressional bills and 6,500 senatorial sessions going
+	  back to the 103rd congress, which served in 1993 and 1994. 
 	</p>
+
+	<div clas="header">
+	  <h4>Live Updates</h4>
+	</div>
+	<p>SYS stays up to date with the senate's hectic schedule and
+	continuously updates each senator's voting record and keeps track of all
+	new bills being introduced to the senate. 
       </div>
 
       <div class="col-xs-2">
@@ -28,17 +35,22 @@
       
       <div class="col-xs-5">
 	<div class="header">
-	  <h4>Model Details</h4>
+	  <h4>Prediction Model</h4>
 	</div>
 	<p>What makes SYS's bill predictions accurate is the leverage gained by
 	  modeling each senator individually. By aggregating these individual
 	  models into one super model we are able to boost our prediction
 	  accuracy by almost 10%, making our pass/fail predictions over 80%
-	  accurate. The math behind this boost is the same as ensemble machine
-	  learning methods.</p>
+	  accurate.
+	</p>
 	<p>Each senator has a predictive model that is based on his or her own
 	  voting record. The predictions made by each model are influenced by
-	  the senator's voting record on bills with similar subject and content.
+	  the senator's voting record on bills with similar subject and
+	  content. For example, if a bill about Women's healthcare is introduced
+	  to the senate SYS will look through each senators' voting record on
+	  bills about women's rights, healthcare, and women's healthcare to make
+	  its predictions.
+	</p>
       </div>
       
       
