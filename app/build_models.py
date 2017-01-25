@@ -126,7 +126,9 @@ def train_model(X,y):
     X = data_pipeline.fit_transform(X)
 
     clf = KNeighborsClassifier()
-    k_range = {'n_neighbors':[1,5,10,50,100]}
+    #    k_range = {'n_neighbors':[1,5,10,50,100]}
+    print(len(X))
+    k_range = {'n_neighbors':[1]}
     weights =  {'weights':['uniform','distance'],
                 'p':[1,2]}
     

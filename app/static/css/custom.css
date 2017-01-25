@@ -12,3 +12,7 @@
     background-image: url("/static/img/capitol_buiding.jpg");
     background-size: cover;
 }
+
+.bg-danger{
+    background-color: #c2606e;
+}
