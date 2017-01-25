@@ -54,7 +54,6 @@ def vote_topic_freq(memid):
                       .filter(MemberSession.member_id==memid)\
                       .group_by(BillSubject.subject,MemberSession.vote)
     df = pd.read_sql(query.statement,app.config['SQLALCHEMY_DATABASE_URI'])
-    print('Query done')
     df['subject'] = df['subject'].apply(remove_stopwords)
     df = df[df['subject']!='']
     votes = ['Yea','Nay']

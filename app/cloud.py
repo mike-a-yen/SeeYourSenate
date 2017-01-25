@@ -32,7 +32,6 @@ def scalable_color(word, font_size, position, orientation,
     
 def green_color_func(word, font_size, position, orientation,
                    random_state=None, **kwargs):
-    print(word,font_size)
     return tuple(Greens_9.colors[np.random.randint(5,9)])
 
 def red_color_func(word, font_size, position, orientation,
@@ -44,17 +43,11 @@ def blue_color_func(word, font_size, position, orientation,
     return tuple(Blues_9.colors[np.random.randint(5,9)])
 
 def cloud_to_fig(cloud):
-    print('Cloud to Fig')
     fig,ax = plt.subplots(figsize=(7,7))
     fig.tight_layout()
-    print('imshow')
-    print(cloud)
     ax.imshow(cloud,origin='lower')
-    #ax.set_frame_on(False)
-    print('remove axis')
     ax.xaxis.set_major_formatter(plt.NullFormatter())
     ax.yaxis.set_major_formatter(plt.NullFormatter())
-    print('done in cloud to fig')
     return fig
 
 def save_member_cloud(html,member,key):
@@ -109,7 +102,6 @@ def generate_word_cloud(word_freq, type='Yea'):
     wc = wc.generate_from_frequencies(word_freq)
 
     word_color_table = word_cloud_color_table(wc,color_map,scale=(4,8))
-    print(word_color_table)
     color_func = partial(scalable_color,word_color_table=word_color_table)    
     #wc = wc.generate(words)
     wc = wc.recolor(color_func=color_func)
