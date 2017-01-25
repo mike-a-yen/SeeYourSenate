@@ -32,7 +32,7 @@
       <form class="form-inline" action="/senator" method="POST">
 	<div class="form-group">
 	  <label for="sel1">Select a senator:</label>
-	  <select class="form-control input-small" id="sel1" name="senator">
+	  <select class="custom-select" id="sel1" name="senator">
 	    <option value="" selected disabled>Please select</option>
 	    {%- for senator in senators %}
 	    <option value="{{ senator }}">{{ senator }}</option>
