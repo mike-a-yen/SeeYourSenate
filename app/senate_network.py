@@ -1,7 +1,7 @@
-#from app import db, BASE_DIR
-#from app.models import *
-#from app.member_utils import vote_map
-#from app.utils import get_senate
+from app import db, BASE_DIR
+from app.models import *
+from app.member_utils import vote_map
+from app.utils import get_senate
 
 import networkx as nx
 import community
@@ -31,7 +31,9 @@ def create_network(member_ids,sessions):
         
     for session in sessions:
         member_session = db.session.query(MemberSession)\
-                            .filter_by(session_id=session.session_id).all()
+                            .filter(MemberSession.session_id==session.session_id)\
+                            .filter(MemberSession.member_id.in_(member_ids))\
+                            .all()
         record = [(ms.member_id,ms.vote) for ms in member_session]
         pairs = it.combinations(record,2)
         for pair in pairs:
@@ -50,21 +52,6 @@ def create_network(member_ids,sessions):
                                        /attr['total_count']
     return G
 
-
-def laplacian_norm(affinity):
-    degree = np.diag(affinity.sum(axis=1))
-    degree_sqrt_inv = LA.inv(LA.sqrtm(degree))
-    I = np.eye(len(affinity))
-    L = I - np.dot(degree_sqrt_inv,
-                   np.dot(affinity,degree_sqrt_inv))
-    L[np.abs(L) < 1e-5] = 0
-    return scipy.real(L)
-    
-def eigensystem(L):
-    w,v = LA.eig(L)
-    w_sorted = np.sort(scipy.real(w))
-    v_sorted = v[np.argsort(scipy.real(w))]
-    return w_sorted, v_sorted
     
 if __name__=='__main__':
     #affinity = np.array([[0,10,1],[10,0,0],[1,0,0]])
@@ -74,7 +61,7 @@ if __name__=='__main__':
     #sessions = db.session.query(Session).filter_by(congress_id=114).all()
     #G = create_network(member_ids,sessions)
     #nx.write_gpickle(G,'graph.gpickle')
-    G = nx.read_gpickle('graph.gpickle')
+    G = nx.read_gpickle(BASE_DIR+'/app/static/graphs/graph.gpickle')
     #graph = nx.to_numpy_recarray(G,dtype=[('similarity_score',float),
     #                                      ('similarity_count',int),
     #                                      ('dissimilarity_count',int),

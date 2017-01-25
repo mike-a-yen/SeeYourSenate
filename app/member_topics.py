@@ -2,6 +2,7 @@ from app import app,db, BASE_DIR
 from app.models import *
 from app.member_utils import member_vote_table
 from app.utils import merge_dicts
+from app.build_models import stopwords
 
 import os
 import pandas as pd
@@ -42,6 +43,9 @@ def get_word_freq_from_centroid(centroid, features, n):
                  for ind in ordered_centroid[:n]}
     return word_freq
 
+def remove_stopwords(text):
+    return ' '.join([word for word in text.split() if word.lower() not in stopwords])
+
 def vote_topic_freq(memid):
     query = db.session.query(BillSubject.subject,MemberSession.vote, func.count())\
                       .filter(Bill.bill_id==BillSubject.bill_id)\
@@ -50,13 +54,27 @@ def vote_topic_freq(memid):
                       .filter(MemberSession.member_id==memid)\
                       .group_by(BillSubject.subject,MemberSession.vote)
     df = pd.read_sql(query.statement,app.config['SQLALCHEMY_DATABASE_URI'])
-    print('Query done')
+    df['subject'] = df['subject'].apply(remove_stopwords)
+    df = df[df['subject']!='']
     votes = ['Yea','Nay']
     df = df[df['vote'].isin(votes)]
-    groups = df.groupby(['vote','subject'],as_index=False).sum()
-    yay = groups[groups['vote']=='Yea']
-    nay = groups[groups['vote']=='Nay']
-    vote_words = {'Yea':yay['subject'].str.cat(sep=' '),
-                  'Nay':nay['subject'].str.cat(sep=' ')}
+    groups = df.groupby(['subject','vote'],as_index=False).sum()
+    groups = groups.groupby(['subject'],as_index=False).max()
+    yay = groups[groups['vote']=='Yea'].sort_values(['count_1'],ascending=False)
+    nay = groups[groups['vote']=='Nay'].sort_values(['count_1'],ascending=False)
+    if len(yay) == 0:
+        yay_freq = [('None',1)]*500
+    else:
+        yay_freq = [(word,row['count_1'])
+                    for _,row in yay.iterrows()
+                    for word in row['subject'].split()]
+    if len(nay) == 0:
+        nay_freq = [('None',1)]*500
+    else:
+        nay_freq = [(word,row['count_1'])
+                    for _,row in nay.iterrows()
+                    for word in row['subject'].split()]
+    vote_words = {'Yea':yay_freq,
+                  'Nay':nay_freq}
     return vote_words
 
