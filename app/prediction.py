@@ -16,7 +16,7 @@ from sklearn.externals import joblib
 
 
 
-def senator_prediction(member,version,bill_data):
+def senator_prediction(member,version,bill_data,record=False):
     model_query = db.session.query(PredictionModel)\
                             .filter_by(member_id=member.member_id)\
                             .filter_by(version=version)
@@ -27,7 +27,15 @@ def senator_prediction(member,version,bill_data):
     else:
         vote = None
     if record:
-        record_prediction(member,bill_data['bill_id'],vote,prediction_model)
+        bill_id = bill_data['bill_id'].iloc[0]
+        memid = member.member_id
+        model_id = prediction_model.model_id
+        vote_prediction = VotePrediction(bill_id, memid, vote,
+                                         model_id, datetime.now(),
+                                         correct=None)
+        return vote_prediction
+        db.session.add(vote_prediction)
+        db.session.commit()
     return vote
 
 def senate_prediction(members,bill_data,record=False):

@@ -90,7 +90,6 @@ def bill():
               .order_by(Session.date.desc()).first()
 
     if session:
-    
         votes = db.session.query(Member.first_name,Member.last_name,Member.state,Member.party,
                                  MemberSession.vote)\
                           .filter(Member.member_id==MemberSession.member_id)\

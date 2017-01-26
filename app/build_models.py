@@ -89,7 +89,7 @@ class DateEncoder(base.BaseEstimator,base.TransformerMixin):
         return self
 
     def transform(self,X):
-        return X.apply(datetime.timestamp).values[:,np.newaxis]
+        return X.apply(lambda x: x.year).values[:,np.newaxis]
     
 
 class DataPipeline(FeatureUnion):
@@ -126,9 +126,10 @@ def train_model(X,y):
     X = data_pipeline.fit_transform(X)
 
     clf = KNeighborsClassifier()
-    #    k_range = {'n_neighbors':[1,5,10,50,100]}
-    print(len(X))
-    k_range = {'n_neighbors':[1]}
+
+    max_k = min(100,len(y)//10)
+    
+    k_range = {'n_neighbors':np.unique(np.linspace(1,max_k,5,dtype=int))}
     weights =  {'weights':['uniform','distance'],
                 'p':[1,2]}
     
@@ -151,18 +152,14 @@ def build_model(memid):
     member is a database Member object
     """
     df = member_vote_table(memid)
+    df = df[df['date']>=datetime(2015,1,1)]
     df.dropna(subset=['vote'],inplace=True)
     df.fillna('',inplace=True)
     y = df['vote']
     X = df.drop(['vote'],axis=1)
 
-    if len(X) < 10: # new member
-        model = None
-        data_transformer = None
-        accuracy = np.nan
-    else:
-        model,accuracy = train_model(X,y)
-        data_transformer = model.steps[0][1]
+    model,accuracy = train_model(X,y)
+    data_transformer = model.steps[0][1]
     return model, accuracy, data_transformer
 
 

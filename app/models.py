@@ -164,7 +164,7 @@ class BillPrediction(db.Model):
         self.model_id = model_id
         self.correct = correct
         
-class VotePrecition(db.Model):
+class VotePrediction(db.Model):
     __tablename__ = 'voteprediction'
     id = db.Column('id',db.Integer,primary_key=True)
     bill_id = db.Column('bill_id',db.ForeignKey('bill.bill_id'))
