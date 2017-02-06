@@ -178,3 +178,53 @@ def get_active_senate_bills(xml_root):
                             bill_id = article.text.lower().replace('.','')
                             bills.append((name,bill_id))
     return bills
+
+
+def senator_wikipage(first_name,last_name):
+    wiki_base = 'https://en.wikipedia.org/wiki/'
+    url = os.path.join(wiki_base,first_name+'_'+last_name)
+    page = requests.get(url)
+    return page
+
+
+def get_children(soup):
+    for tag in soup.find_all('tr'):
+        for child in tag.children:
+            if child.name=='th' and child.text == 'Children':
+                children = tag.find('td').text
+                if re.search('[0-9]+',children):
+                    children = int(re.search('([0-9]+)',children).group())
+                else:
+                    children = len(tag.find_all('td'))
+                return children
+    return 0
+
+def get_married(soup):
+    for tag in soup.find_all('tr'):
+        for child in tag.children:
+            if child.name=='th' and child.text == 'Spouse(s)':
+                return 1
+    return 0
+            
+def senator_demographics(member,populate=False):
+    page = senator_wikipage(member.first_name,member.last_name)
+    wikiurl = page.url
+    print(wikiurl)
+    soup = BeautifulSoup(page.text,'html.parser')
+
+    bday = soup.find('span',{'class':'bday'})
+    if bday:
+        birthdate = datetime.strptime(bday.text,'%Y-%m-%d')
+    else:
+        birthdate = None
+        
+    married = get_married(soup)
+
+    n_children = get_children(soup)
+
+    if populate:
+        member.birthdate = birthdate
+        member.married = married
+        member.children = n_children
+        db.session.commit()
+    return (birthdate,married,n_children)

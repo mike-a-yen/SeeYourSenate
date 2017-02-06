@@ -130,10 +130,20 @@ class Member(db.Model):
     display_name = db.Column('display',db.String(80))
     state = db.Column('state',db.String(40))
     party = db.Column('party',db.String(20))
-
+    
+    phone_number = db.Column('phone_number',db.String(20))
+    birthdate = db.Column('birthdate',db.DateTime)
+    birth_state = db.Column('birth_state',db.String(40))
+    married = db.Column('married',db.Integer)
+    children = db.Column('children',db.Integer)
+    elect_date = db.Column('elect_date',db.DateTime)
+    
     printstr = '<Member member_id:{member_id} display_name:{display_name}>'
     
-    def __init__(self, member_id, first, last, display, state, party):
+    def __init__(self, member_id, first, last, display, state, party,
+                 phone_number, birthdate, birth_state, married, children,
+                 elect_date):
+        
         self.member_id = member_id
         self.first_name = first
         self.last_name = last
@@ -141,9 +151,36 @@ class Member(db.Model):
         self.state = state
         self.party = party
 
+        self.phone_number = phone_number
+        self.birthdate = birthdate
+        self.birth_state = birth_state
+        self.married = married
+        self.children = children
+        self.elect_date = elect_date
+        
     def __repr__(self):
         return self.printstr.format(**{'member_id':self.member_id,
                                        'display_name':self.display_name})
+
+
+class MemberEducation(db.Model):
+    __tablename__ = 'membereducation'
+    id = db.Column('id', db.Integer, primary_key=True)
+    member_id = db.Column('member_id', db.ForeignKey('member.member_id'))
+    school = db.Column('school', db.String(40))
+    degree = db.Column('degree',db.String(20))
+    printstr = '<MemberEducation member_id:{member_id} school:{school} degree:{degree}>'
+    
+    def __init__(self, member_id, school, degree):
+        self.member_id = member_id
+        self.school = school
+        self.degree = degree
+
+
+    def __repr__(self):
+        return self.printstr.format(**{'member_id':self.member_id,
+                                       'school':self.school,
+                                       'degree':self.degree})
 
     
 class BillPrediction(db.Model):
