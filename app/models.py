@@ -67,12 +67,13 @@ class Bill(db.Model):
     popular_title = db.Column('popular_title',db.String(240))
     top_subject = db.Column('top_subject',db.String(120))
     text = db.Column('text',db.Text)
+    summary = db.Column('summary',db.Text)
     url = db.Column('url',db.String(120))
     active = db.Column('active',db.Boolean)
     
     def __init__(self, bill_id, congress_id, type, number,
                  title, short_title, popular_title,
-                 top_subject, text, url, active=False):
+                 top_subject, text, summary, url, active=False):
 
         self.bill_id = bill_id
         self.congress_id = congress_id 
@@ -83,6 +84,7 @@ class Bill(db.Model):
         self.popular_title = popular_title
         self.top_subject = top_subject
         self.text = text
+        self.summary = summary
         self.url = url
         self.active = active
 

@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>{{ first_name }} {{ last_name }} on {{ subject }}</h2>
+      <p>{{ first_name }} {{ last_name }} has voted on {{ subject }} {{ n }} times.</p>
+    </div>
+  </div>
+</div>
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="header">
+	<h4>Bills</h4>
+      </div>
+      <div class="col-xs-12 pre-scrollable">
+	<table class="table table-hover">
+	  <tr>
+	    <th>Bill ID
+	    <th>Title
+	    <th>Main Subject
+	    <th>Historical Vote
+	  </tr>
+	  {%- for row in bills %}
+	  <tr onclick="document.location='/bill_summary/{{row.bill_id}}'"
+	      style="cursor: pointer">
+	    <td>{{ row.bill_id }}</td>
+	    <td>{{ row.title }}</td>
+	    <td>{{ row.date }}</td>
+	    {% if row.vote %}
+	    <td><img src="/static/img/checkmark.png"
+		     width="16px"></td>
+	    {% else %}
+	    <td><img src="/static/img/xmark.png"
+		     width="16px"></td>
+	    {% endif %}
+	  </tr>
+	  </a>
+	  {%- endfor %}
+	</table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

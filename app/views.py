@@ -1,12 +1,13 @@
 from app import app, db, BASE_DIR
 from app.models import *
 from app.member_topics import vote_topic_freq
-from app.member_utils import vote_map
+from app.member_utils import vote_map, member_vote_subject_bill_table
 from app.build_models import positive_negative_subjects, voting_subject_record
 from app.model_prediction import senate_prediction
 from app.utils import (get_random_member,
                        get_senate,
-                       get_active_bills)
+                       get_active_bills,
+                       bill_display_title)
 from app.cloud import make_word_cloud, save_member_cloud
 
 import os
@@ -52,7 +53,8 @@ def senator():
                            .filter(Member.display_name==member_request)\
                            .first()
     else:
-        member = get_random_member()
+        #serve Mitch McConnell
+        member = db.session.query(Member).filter_by(member_id='S174').first()
         
     memid = member.member_id
     print('member id:',memid)
@@ -65,9 +67,32 @@ def senator():
                                  last_name=member.last_name,
                                  state=member.state,
                                  party=member.party,
+                                 memid=member.member_id,
                                  yay_cloud=clouds['Yea'],
                                  nay_cloud=clouds['Nay'],
                                  subjects=subjects)
+
+@app.route('/subject_view/<subject>/<member_id>')
+def subject_view(subject,member_id):
+    member = db.session.query(Member).filter_by(member_id=member_id).first()
+
+    vote_subjects = member_vote_subject_bill_table(member_id,subject)
+    vote_subjects['bill_id'] = vote_subjects['bill_id'].apply(str.upper)
+    return flask.render_template('subject_view.html',
+                                 first_name=member.first_name,
+                                 last_name=member.last_name,
+                                 subject=subject,
+                                 n=len(vote_subjects),
+                                 bills=vote_subjects.T.to_dict().values())
+
+
+@app.route('/bill_summary/<bill_id>')
+def bill_summary(bill_id):
+    bill = db.session.query(Bill).filter_by(bill_id=bill_id.lower()).first()
+    display_title = bill_display_title(bill)
+    return flask.render_template('bill_summary.html',
+                                 bill=bill,
+                                 display_title=display_title)
 
 @app.route('/active')
 def active():

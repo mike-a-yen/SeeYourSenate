@@ -7,7 +7,6 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12">
-      <h4>About</h4>
       <p>Congress votes on about one new bill every day.
 	Keeping track of what your represenative votes
 	for and against is a daunting task, and it is
@@ -71,7 +70,7 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-xs-12">
-      <div class="table-responsive">
+      <div class="table-responsive pre-scrollable">
 	<table class="table table-hover table-striped">
 	  <thead>
 	    <tr>
@@ -84,7 +83,8 @@
 	  </thead>
 	  <tbody>
 	    {%- for row in subjects %}
-	    <tr class={{ "success" if row.done }}>
+	    <tr onclick="document.location='/subject_view/{{row.subject}}/{{memid}}'"
+	      style="cursor: pointer">
 	      <td>{{ row.subject }}
 	      <td>{{ row.for_vote }}
 	      <td>{{ row.against_vote }}
@@ -96,6 +96,7 @@
 		{% else %}
 	      <td>
 		{% endif %}
+	    </tr>
 		{%- endfor %}
 	  </tbody>
 	</table>

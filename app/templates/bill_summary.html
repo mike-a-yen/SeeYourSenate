@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <h2>{{display_title}}</h2>
+      <h4>Subject: {{bill.top_subject}}</h4>
+      <h4>{{bill.title}}</h4>
+    </div>
+  </div>
+</div>
+<br>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="header">
+	<h4>Summary</h4>
+      </div>
+      <div class="col-xs-12 pre-scrollable">
+	<p>{{bill.summary}}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
