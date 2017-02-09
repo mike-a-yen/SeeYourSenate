@@ -83,7 +83,7 @@ def member_vote_subject_bill_table(memid,subject):
     table['date'] = table['date'].apply(convert_date)
     table['vote'] = table['vote'].apply(vote_map)
 
-    return table.sort_values(['bill_id','date'],ascending=False)
+    return table.sort_values(['date'],ascending=False)
 
 
 def simple_title(row):
