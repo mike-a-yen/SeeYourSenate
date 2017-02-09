@@ -70,7 +70,7 @@ def member_vote_subject_table(memid):
 def member_vote_subject_bill_table(memid,subject):
     query = db.session.query(Bill.bill_id,Bill.top_subject,Bill.title,
                              Bill.short_title,Bill.popular_title,
-                             Session.date,MemberSession.vote)\
+                             Session.category,Session.date,MemberSession.vote)\
                       .filter(Bill.bill_id==Session.bill_id)\
                       .filter(Session.session_id==MemberSession.session_id)\
                       .filter(MemberSession.member_id==memid)\
@@ -80,10 +80,12 @@ def member_vote_subject_bill_table(memid,subject):
     table['title'] = table.apply(simple_title,axis=1)
     table.drop(['short_title','popular_title'],axis=1,inplace=True)
     convert_date = lambda x: datetime.strftime(x,'%b %d, %Y')
-    table['date'] = table['date'].apply(convert_date)
+    table = table.sort_values(['date'],ascending=False)
+    table['datestr'] = table['date'].apply(convert_date)
+    table['category'] = table['category'].apply(lambda x: x[0].upper()+x[1:].lower())
     table['vote'] = table['vote'].apply(vote_map)
 
-    return table.sort_values(['date'],ascending=False)
+    return table
 
 
 def simple_title(row):

@@ -18,17 +18,17 @@
       <div class="col-xs-12 pre-scrollable">
 	<table class="table table-hover">
 	  <tr>
-	    <th>Bill ID
 	    <th>Title
-	    <th>Main Subject
+	    <th>Vote Type
+	    <th>Date
 	    <th>Historical Vote
 	  </tr>
 	  {%- for row in bills %}
 	  <tr onclick="document.location='/bill_summary/{{row.bill_id}}'"
 	      style="cursor: pointer">
-	    <td>{{ row.bill_id }}</td>
 	    <td>{{ row.title }}</td>
-	    <td>{{ row.date }}</td>
+	    <td>{{ row.category }}</td>
+	    <td>{{ row.datestr }}</td>
 	    {% if row.vote %}
 	    <td><img src="/static/img/checkmark.png"
 		     width="16px"></td>

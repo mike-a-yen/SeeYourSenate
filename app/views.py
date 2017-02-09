@@ -78,12 +78,14 @@ def subject_view(subject,member_id):
 
     vote_subjects = member_vote_subject_bill_table(member_id,subject)
     vote_subjects['bill_id'] = vote_subjects['bill_id'].apply(str.upper)
+    bill_data = list(vote_subjects.T.to_dict().values())
+    bill_data.sort(key=lambda x: -1*x['date'].timestamp())
     return flask.render_template('subject_view.html',
                                  first_name=member.first_name,
                                  last_name=member.last_name,
                                  subject=subject,
                                  n=len(vote_subjects),
-                                 bills=vote_subjects.T.to_dict().values())
+                                 bills=bill_data)
 
 
 @app.route('/bill_summary/<bill_id>')
