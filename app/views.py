@@ -36,7 +36,10 @@ def preliminary():
                                  cluster_plot=cluster_plot,
                                  stats_plot=stats_plot)
 
-
+@app.route('/contact')
+def contact():
+    return flask.render_template('contact_info.html')
+    
 @app.route('/senator',methods=['GET','POST'])
 def senator():
     senate_members = get_senate()
