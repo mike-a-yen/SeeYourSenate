@@ -52,7 +52,9 @@ def senator():
                            .filter(Member.display_name==member_request)\
                            .first()
     else:
-        member = get_random_member()
+        #serve mitch mcConnell
+        member = db.session.query(Member).filter_by(member_id='S174').first()
+        #member = get_random_member()
         
     memid = member.member_id
     print('member id:',memid)
