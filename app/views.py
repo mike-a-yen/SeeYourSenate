@@ -54,7 +54,7 @@ def senator():
                            .first()
     else:
         #serve Mitch McConnell
-        member = db.session.query(Member).filter_by(member_id='S174').first()
+        member = db.session.query(Member).filter_by(member_id='S270').first()
         
     memid = member.member_id
     print('member id:',memid)
