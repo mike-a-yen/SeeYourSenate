@@ -65,3 +65,31 @@ def member_vote_subject_table(memid):
     df = pd.DataFrame(query,columns=['subject','vote'])
     df['result'] = df['vote'].apply(vote_map)
     return df
+
+
+def member_vote_subject_bill_table(memid,subject):
+    query = db.session.query(Bill.bill_id,Bill.top_subject,Bill.title,
+                             Bill.short_title,Bill.popular_title,
+                             Session.date,MemberSession.vote)\
+                      .filter(Bill.bill_id==Session.bill_id)\
+                      .filter(Session.session_id==MemberSession.session_id)\
+                      .filter(MemberSession.member_id==memid)\
+                      .filter(Bill.top_subject==subject)
+    table = pd.read_sql_query(query.statement,app.config['SQLALCHEMY_DATABASE_URI'])
+    
+    table['title'] = table.apply(simple_title,axis=1)
+    table.drop(['short_title','popular_title'],axis=1,inplace=True)
+    convert_date = lambda x: datetime.strftime(x,'%b %d, %Y')
+    table['date'] = table['date'].apply(convert_date)
+    table['vote'] = table['vote'].apply(vote_map)
+
+    return table.sort_values(['bill_id','date'],ascending=False)
+
+
+def simple_title(row):
+    if row['popular_title']:
+        return row['popular_title']
+    elif row['short_title']:
+        return row['short_title']
+    else:
+        return row['title']

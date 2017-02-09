@@ -84,7 +84,8 @@
 	  </thead>
 	  <tbody>
 	    {%- for row in subjects %}
-	    <tr class={{ "success" if row.done }}>
+	    <tr onclick="document.location='/subject_view/{{row.subject}}/{{memid}}'"
+	      style="cursor: pointer">
 	      <td>{{ row.subject }}
 	      <td>{{ row.for_vote }}
 	      <td>{{ row.against_vote }}
@@ -96,6 +97,7 @@
 		{% else %}
 	      <td>
 		{% endif %}
+	    </tr>
 		{%- endfor %}
 	  </tbody>
 	</table>

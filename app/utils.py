@@ -24,6 +24,14 @@ def document_title(doc):
         return json.loads(doc).get('title','')  
 
 
+def bill_display_title(bill):
+        if bill.popular_title:
+            return bill.popular_title
+        elif bill.short_title:
+            return bill.short_title
+        else:
+            return bill.title
+
 def get_random_member():
     n_members = db.session.query(Member).count()
     ind = np.random.randint(0,n_members)
