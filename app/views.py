@@ -53,7 +53,7 @@ def senator():
                            .filter(Member.display_name==member_request)\
                            .first()
     else:
-        #serve Mitch McConnell
+        #serve Chuck Schumer as default
         member = db.session.query(Member).filter_by(member_id='S270').first()
         
     memid = member.member_id
