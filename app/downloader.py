@@ -141,7 +141,13 @@ def get_bill_url_from_bill_id(bill_id,congress_id):
                         bill_type,bill_id,'data.json')
     return base
 
-            
+
+def download_from_congress(congress_id):
+    url = os.path.join(congress_base_url,str(congress_id))
+    print('Starting download from', url)
+    download_json_from_url(url)
+    return 
+
 def download_from_active_page(congress_id):
     url = 'http://www.senate.gov/reference/active_bill_type/%d.xml'%congress_id
     page = requests.get(url)

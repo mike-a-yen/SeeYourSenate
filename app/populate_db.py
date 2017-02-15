@@ -6,9 +6,6 @@ import glob
 import json
 from datetime import datetime
 
-import logging
-log_file = os.path.join(BASE_DIR,'data','logs','database.log')
-logging.basicConfig(filename=log_file,level=logging.DEBUG)
 
 def get_doc_id(doc_data):
     if not doc_data:
@@ -52,14 +49,11 @@ def populate_session(session_data):
                       subject,category,requires,
                       result,passed,url)
     db.session.add(session)
-    logging.info('Session added: '.join(session.__repr__()))
     db.session.commit()
-    logging.info('Session populated: '.join(session.__repr__()))
 
     session_id = session.session_id
     votes = data.get('votes')
     populate_votes(votes,session_id)
-
     return
 
 def populate_votes(votes,session_id):
@@ -80,13 +74,9 @@ def populate_votes(votes,session_id):
             member_query = db.session.query(Member).filter_by(member_id=member_id).first()
             if not member_query:
                 db.session.add(member)
-                logging.info('Member added: '.join(member.__repr__()))
             membersession = MemberSession(session_id,member_id,vote)
             db.session.add(membersession)
-            logging.info('MemberSession added: '.join(membersession.__repr__()))
             db.session.commit()
-            logging.info('Member populated: '.join(member.__repr__()))
-            logging.info('MemberSession populated: '.join(membersession.__repr__()))
     return
 
 def populate_bill(bill_data):
@@ -123,16 +113,12 @@ def populate_bill(bill_data):
         return bill
     
     db.session.add(bill)
-    logging.info('Bill added: '.join(bill.__repr__()))
     db.session.commit()
-    logging.info('Bill populated: '.join(bill.__repr__()))
     
     for sub in subjects:
         billsubject = BillSubject(bill.bill_id, sub)
         db.session.add(billsubject)
-        logging.info('BillSubject added: '.join(billsubject.__repr__()))
         db.session.commit()
-        logging.info('BillSubject populated: '.join(billsubject.__repr__()))
     return bill
     
 def populate_congress(congress_id):
